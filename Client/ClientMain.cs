@@ -1,4 +1,4 @@
-﻿using ComLib;
+using ComLib;
 using System;
 using System.Drawing;
 using System.Net;
