@@ -112,13 +112,16 @@
             // 
             // Rtxt_chat
             // 
+            this.Rtxt_chat.BackColor = System.Drawing.SystemColors.Window;
             this.Rtxt_chat.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.Rtxt_chat.Location = new System.Drawing.Point(13, 52);
             this.Rtxt_chat.Name = "Rtxt_chat";
+            this.Rtxt_chat.ReadOnly = true;
             this.Rtxt_chat.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.Rtxt_chat.Size = new System.Drawing.Size(608, 282);
             this.Rtxt_chat.TabIndex = 25;
             this.Rtxt_chat.Text = "";
+            this.Rtxt_chat.TextChanged += new System.EventHandler(this.Rtxt_chat_TextChanged);
             // 
             // ClientMain
             // 

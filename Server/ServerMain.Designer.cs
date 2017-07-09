@@ -29,10 +29,9 @@
         private void InitializeComponent()
         {
             this.Btn_send = new System.Windows.Forms.Button();
-            this.txt_sendMes = new System.Windows.Forms.TextBox();
-            this.txt_chatMes = new System.Windows.Forms.TextBox();
+            this.Txt_send = new System.Windows.Forms.TextBox();
             this.Btn_start = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.Rtxt_chat = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // Btn_send
@@ -47,26 +46,14 @@
             this.Btn_send.Text = "Send";
             this.Btn_send.UseVisualStyleBackColor = true;
             // 
-            // txt_sendMes
+            // Txt_send
             // 
-            this.txt_sendMes.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txt_sendMes.Location = new System.Drawing.Point(12, 357);
-            this.txt_sendMes.Multiline = true;
-            this.txt_sendMes.Name = "txt_sendMes";
-            this.txt_sendMes.Size = new System.Drawing.Size(593, 105);
-            this.txt_sendMes.TabIndex = 24;
-            // 
-            // txt_chatMes
-            // 
-            this.txt_chatMes.BackColor = System.Drawing.SystemColors.Window;
-            this.txt_chatMes.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.txt_chatMes.Location = new System.Drawing.Point(12, 64);
-            this.txt_chatMes.Multiline = true;
-            this.txt_chatMes.Name = "txt_chatMes";
-            this.txt_chatMes.ReadOnly = true;
-            this.txt_chatMes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_chatMes.Size = new System.Drawing.Size(593, 287);
-            this.txt_chatMes.TabIndex = 23;
+            this.Txt_send.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Txt_send.Location = new System.Drawing.Point(12, 357);
+            this.Txt_send.Multiline = true;
+            this.Txt_send.Name = "Txt_send";
+            this.Txt_send.Size = new System.Drawing.Size(593, 105);
+            this.Txt_send.TabIndex = 24;
             // 
             // Btn_start
             // 
@@ -80,14 +67,18 @@
             this.Btn_start.UseVisualStyleBackColor = true;
             this.Btn_start.Click += new System.EventHandler(this.Btn_start_Click);
             // 
-            // listBox1
+            // Rtxt_chat
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 12;
-            this.listBox1.Location = new System.Drawing.Point(630, 134);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(120, 184);
-            this.listBox1.TabIndex = 26;
+            this.Rtxt_chat.BackColor = System.Drawing.SystemColors.Window;
+            this.Rtxt_chat.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.Rtxt_chat.Location = new System.Drawing.Point(12, 64);
+            this.Rtxt_chat.Name = "Rtxt_chat";
+            this.Rtxt_chat.ReadOnly = true;
+            this.Rtxt_chat.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.Rtxt_chat.Size = new System.Drawing.Size(593, 287);
+            this.Rtxt_chat.TabIndex = 27;
+            this.Rtxt_chat.Text = "";
+            this.Rtxt_chat.TextChanged += new System.EventHandler(this.Rtxt_chat_TextChanged);
             // 
             // ServerMain
             // 
@@ -95,13 +86,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.Rtxt_chat);
             this.Controls.Add(this.Btn_send);
-            this.Controls.Add(this.txt_sendMes);
-            this.Controls.Add(this.txt_chatMes);
+            this.Controls.Add(this.Txt_send);
             this.Controls.Add(this.Btn_start);
             this.Name = "ServerMain";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.ServerMain_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -110,10 +101,9 @@
         #endregion
 
         private System.Windows.Forms.Button Btn_send;
-        private System.Windows.Forms.TextBox txt_sendMes;
-        private System.Windows.Forms.TextBox txt_chatMes;
+        private System.Windows.Forms.TextBox Txt_send;
         private System.Windows.Forms.Button Btn_start;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.RichTextBox Rtxt_chat;
     }
 }
 

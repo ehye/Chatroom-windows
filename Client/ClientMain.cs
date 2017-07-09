@@ -16,9 +16,8 @@ namespace Client
     public partial class ClientMain : Form
     {
         bool isRunning = false;
-        Socket client = new Socket(AddressFamily.InterNetwork,
-            SocketType.Stream, ProtocolType.Tcp);
-        IPEndPoint ipe =  new IPEndPoint(
+        TcpClient client;
+        IPEndPoint ipe = new IPEndPoint(
             ComLib.ConnectionData.ServerIP, ComLib.ConnectionData.ServerPort);
 
         public ClientMain()
@@ -31,31 +30,62 @@ namespace Client
             this.Text = Environment.MachineName + " Chat on " + Environment.OSVersion.ToString();
         }
 
-        private void Btn_connect_Click(object sender, EventArgs e)
-        {
-            isRunning = !isRunning;
-            if (isRunning)  Btn_connect.Text = "Disconnect";
-            else            Btn_connect.Text = "Connect";
-            Txt_username.Enabled = !Txt_username.Enabled;
-            Txt_password.Enabled = !Txt_password.Enabled;
-            Btn_send.Enabled = !Btn_send.Enabled;
-
-            Connect();
-
-        }
-
         private void Connect()
         {
             try
             {
+                client = new TcpClient();
                 client.Connect(ipe);
-                Console.WriteLine("Socket connected to {0}", client.RemoteEndPoint.ToString());
+                Console.WriteLine("Socket connected to {0}", ipe.ToString());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw;
             }
+
+        }
+
+        private void Receive()
+        {
+            while (true)
+            {
+                Byte[] bytes = new byte[1024];
+                int bytesRec = client.Client.Receive(bytes);
+                Console.WriteLine("Echoed text = {0}", Encoding.UTF8.GetString(bytes));
+            }
+        }
+
+        private void Send()
+        {
+            Byte[] msg = Encoding.UTF8.GetBytes(Txt_send.Text);
+            if (client.Connected)
+            {
+                client.Client.Send(msg);
+            }
+            else
+            {
+                //client.Connect(ipe);
+            }
+        }
+
+        private void Btn_connect_Click(object sender, EventArgs e)
+        {
+            isRunning = !isRunning;
+            if (isRunning)
+            {
+                Btn_connect.Text = "Disconnect";
+                Connect();
+                Thread tReceive = new Thread(Receive);
+                tReceive.Start();
+            }
+            else
+            {
+                Btn_connect.Text = "Connect";
+            }
+            Txt_username.Enabled = !Txt_username.Enabled;
+            Txt_password.Enabled = !Txt_password.Enabled;
+            Btn_send.Enabled = !Btn_send.Enabled;
         }
 
         private void Btn_send_Click(object sender, EventArgs e)
@@ -64,29 +94,15 @@ namespace Client
             Rtxt_chat.AppendText(Environment.NewLine + Txt_send.Text + Environment.NewLine, Color.Black);
 
             Send();
-            Rtxt_chat.Select(Rtxt_chat.TextLength, 0);
-            Rtxt_chat.ScrollToCaret();
             Txt_send.Clear();
             Txt_send.Focus();
         }
 
-        private void Send()
+        private void Rtxt_chat_TextChanged(object sender, EventArgs e)
         {
-            //client.Connect(ipe);
+            Rtxt_chat.Select(Rtxt_chat.TextLength, 0);
+            Rtxt_chat.ScrollToCaret();
 
-            Byte[] msg = Encoding.UTF8.GetBytes("This is a test");
-            client.Send(msg);
-
-            //client.Shutdown(SocketShutdown.Both);
-            //client.Close();
-        }
-
-        private void Receive()
-        {
-            byte[] bytes = new byte[1024];
-            int bytesRec = client.Receive(bytes);
-            Console.WriteLine("Echoed text = {0}",
-                System.Text.Encoding.UTF8.GetString(bytes, 0, bytesRec));
         }
     }
 
