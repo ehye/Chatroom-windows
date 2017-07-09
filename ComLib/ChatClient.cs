@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ComLib
 {
@@ -11,11 +7,13 @@ namespace ComLib
     {
         public string Username { get; private set; }
         public string Password { get; private set; }
-        
-        public ChatClient(string username, string password, string clientIP, bool connect)
+        public string Ip { get; private set; } = ConnectionData.ServerIP.ToString();
+
+        public ChatClient(string username, string password, string ip, bool connect)
         {
             Username = username;
             Password = password;
+            Ip = ip;
         }
     }
 }

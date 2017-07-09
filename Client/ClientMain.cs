@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using ComLib;
+using System;
 using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace Client
 {
@@ -17,14 +16,12 @@ namespace Client
     {
         bool isRunning = false;
         TcpClient client;
-        IPEndPoint ipe = new IPEndPoint(
-            ComLib.ConnectionData.ServerIP, ComLib.ConnectionData.ServerPort);
+        IPEndPoint ipe = ConnectionData.Ipe;
 
         public ClientMain()
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
-
         }
 
         private void ClientMain_Load(object sender, EventArgs e)
@@ -38,6 +35,11 @@ namespace Client
             {
                 client = new TcpClient();
                 client.Connect(ipe);
+
+                var stream = client.GetStream();
+                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, "127.0.0.1", true);
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, chatClient);
                 Console.WriteLine("Socket connected to {0}", ipe.ToString());
             }
             catch (Exception ex)
@@ -45,24 +47,25 @@ namespace Client
                 Console.WriteLine(ex.Message);
                 throw;
             }
-
         }
 
         private void Receive()
         {
             while (true)
             {
+                if (client == null) break;
+
                 var bytes = new byte[1024];
                 var data = String.Empty;
                 var stream = client.GetStream();
-                int i;
-                while ((i = stream.Read(bytes, 0, bytes.Length))!= 0)
+                //int i;
+                //while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                for (int i; client.Connected && (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
                 {
                     data = Encoding.UTF8.GetString(bytes, 0, i);
                     Console.WriteLine("Echoed text = {0}", data);
 
-                    Rtxt_chat.AppendText(Environment.NewLine + Txt_username.Text + " " + DateTime.Now, Color.Blue);
-                    Rtxt_chat.AppendText(Environment.NewLine + data + Environment.NewLine, Color.Black);
+                    ShowMessage(data);
                 }
             }
         }
@@ -74,6 +77,13 @@ namespace Client
             {
                 client.Client.Send(msg);
             }
+            ShowMessage(Rtxt_chat.Text);
+        }
+
+        private void ShowMessage(string data)
+        {
+            Rtxt_chat.AppendText(Environment.NewLine + Txt_username.Text + " " + DateTime.Now, Color.Blue);
+            Rtxt_chat.AppendText(Environment.NewLine + Txt_send.Text + Environment.NewLine, Color.Black);
         }
 
         private void Btn_connect_Click(object sender, EventArgs e)
@@ -90,18 +100,18 @@ namespace Client
             {
                 Btn_connect.Text = "Connect";
                 // Close everything.
+                Console.WriteLine("Close everything.");
                 client.Close();
             }
             Txt_username.Enabled = !Txt_username.Enabled;
             Txt_password.Enabled = !Txt_password.Enabled;
+            Txt_host.ReadOnly = !Txt_host.ReadOnly;
+            Txt_port.ReadOnly = !Txt_port.ReadOnly;
             Btn_send.Enabled = !Btn_send.Enabled;
         }
 
         private void Btn_send_Click(object sender, EventArgs e)
         {
-            Rtxt_chat.AppendText(Environment.NewLine + Txt_username.Text + " " + DateTime.Now, Color.Blue);
-            Rtxt_chat.AppendText(Environment.NewLine + Txt_send.Text + Environment.NewLine, Color.Black);
-
             Send();
             Txt_send.Clear();
             Txt_send.Focus();
@@ -111,7 +121,6 @@ namespace Client
         {
             Rtxt_chat.Select(Rtxt_chat.TextLength, 0);
             Rtxt_chat.ScrollToCaret();
-
         }
     }
 
@@ -128,5 +137,4 @@ namespace Client
             box.SelectionColor = box.ForeColor;
         }
     }
-
 }

@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using ComLib;
+using System;
 using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace Server
 {
     public partial class ServerMain : Form
     {
         volatile bool isListening = false;
-        volatile bool isRecevieDone = false;
+        //volatile bool isRecevieDone = false;
         TcpListener listener;
-        IPEndPoint ipe = new IPEndPoint(
-            ComLib.ConnectionData.ServerIP, ComLib.ConnectionData.ServerPort);
+        ChatClient chatClient;
+        IPEndPoint ipe = ConnectionData.Ipe;
 
         public ServerMain()
         {
@@ -32,7 +31,7 @@ namespace Server
             this.Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
         }
 
-        private async void Listen()
+        private void Listen()
         {
             listener = new TcpListener(ipe);
             listener.Start();
@@ -40,29 +39,39 @@ namespace Server
 
             while (true)
             {
-                Console.WriteLine("While receive...");
-                Byte[] bytes = new byte[1024];
-                String data = null;
-                var handler = await listener.AcceptTcpClientAsync();
-                NetworkStream stream = handler.GetStream();
+                var bytes = new byte[1024];
+                var data = String.Empty;
+                var handler = listener.AcceptTcpClient();
+                var stream = handler.GetStream();
+
+                IFormatter formatter = new BinaryFormatter();
+                chatClient = (ChatClient)formatter.Deserialize(stream);
+                dgv_info.Rows.Add("id", chatClient.Username, chatClient.Ip);
+                listBox_user.Items.Add(chatClient.Username);
+                stream.Flush();
 
                 // Loop to receive all the data sent by the client.
-                int i;
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                for (int i; (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
                 {
                     data = Encoding.UTF8.GetString(bytes, 0, i);
+                    ShowMessage(chatClient.Username, data);
                     Console.WriteLine("Text received : {0}", data);
-                    Rtxt_chat.AppendText(Environment.NewLine + "USER" + " " + DateTime.Now, Color.Blue);
-                    Rtxt_chat.AppendText(Environment.NewLine + data + Environment.NewLine, Color.Black);
 
-                    // Send back a response.
-                    data = data.ToUpper();
-                    byte[] msg = Encoding.UTF8.GetBytes(data);
-                    stream.Write(msg, 0, msg.Length);
-                    Console.WriteLine("Echo: {0}", data);
+                    #region Send back a response
+                    //data = data.ToUpper();
+                    //byte[] msg = Encoding.UTF8.GetBytes(data);
+                    //stream.Write(msg, 0, msg.Length);
+                    //Console.WriteLine("Echo: {0}", data);
+                    #endregion
                 }
                 handler.Close();
             }
+        }
+
+        private void ShowMessage(string username, string message)
+        {
+            Rtxt_chat.AppendText(Environment.NewLine + username + " " + DateTime.Now, Color.Blue);
+            Rtxt_chat.AppendText(Environment.NewLine + message + Environment.NewLine);
         }
 
         private void Btn_start_Click(object sender, EventArgs e)
@@ -80,6 +89,7 @@ namespace Server
             else
             {
                 Btn_start.Text = "Start";
+
             }
         }
 
@@ -87,6 +97,11 @@ namespace Server
         {
             Rtxt_chat.Select(Rtxt_chat.TextLength, 0);
             Rtxt_chat.ScrollToCaret();
+        }
+
+        private void connectToServerCToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Btn_start.PerformClick();
         }
     }
 

@@ -10,5 +10,6 @@ namespace ComLib
     {
         public static System.Net.IPAddress ServerIP { get; set; } = System.Net.IPAddress.Parse("127.0.0.1");
         public static int ServerPort { get; set; } = 6017;
+        public static System.Net.IPEndPoint Ipe { get; set; } = new System.Net.IPEndPoint(ServerIP, ServerPort);
     }
 }
