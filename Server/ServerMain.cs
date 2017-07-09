@@ -56,8 +56,8 @@ namespace Server
                     Rtxt_chat.AppendText(Environment.NewLine + data + Environment.NewLine, Color.Black);
 
                     // Send back a response.
-                    byte[] msg = Encoding.UTF8.GetBytes(data);
                     data = data.ToUpper();
+                    byte[] msg = Encoding.UTF8.GetBytes(data);
                     stream.Write(msg, 0, msg.Length);
                     Console.WriteLine("Echo: {0}", data);
                 }

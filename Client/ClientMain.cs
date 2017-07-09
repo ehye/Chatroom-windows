@@ -23,6 +23,8 @@ namespace Client
         public ClientMain()
         {
             InitializeComponent();
+            Control.CheckForIllegalCrossThreadCalls = false;
+
         }
 
         private void ClientMain_Load(object sender, EventArgs e)
@@ -50,22 +52,27 @@ namespace Client
         {
             while (true)
             {
-                Byte[] bytes = new byte[1024];
-                int bytesRec = client.Client.Receive(bytes);
-                Console.WriteLine("Echoed text = {0}", Encoding.UTF8.GetString(bytes));
+                var bytes = new byte[1024];
+                var data = String.Empty;
+                var stream = client.GetStream();
+                int i;
+                while ((i = stream.Read(bytes, 0, bytes.Length))!= 0)
+                {
+                    data = Encoding.UTF8.GetString(bytes, 0, i);
+                    Console.WriteLine("Echoed text = {0}", data);
+
+                    Rtxt_chat.AppendText(Environment.NewLine + Txt_username.Text + " " + DateTime.Now, Color.Blue);
+                    Rtxt_chat.AppendText(Environment.NewLine + data + Environment.NewLine, Color.Black);
+                }
             }
         }
 
         private void Send()
         {
-            Byte[] msg = Encoding.UTF8.GetBytes(Txt_send.Text);
+            var msg = Encoding.UTF8.GetBytes(Txt_send.Text);
             if (client.Connected)
             {
                 client.Client.Send(msg);
-            }
-            else
-            {
-                //client.Connect(ipe);
             }
         }
 
@@ -76,12 +83,14 @@ namespace Client
             {
                 Btn_connect.Text = "Disconnect";
                 Connect();
-                Thread tReceive = new Thread(Receive);
+                var tReceive = new Thread(Receive);
                 tReceive.Start();
             }
             else
             {
                 Btn_connect.Text = "Connect";
+                // Close everything.
+                client.Close();
             }
             Txt_username.Enabled = !Txt_username.Enabled;
             Txt_password.Enabled = !Txt_password.Enabled;
