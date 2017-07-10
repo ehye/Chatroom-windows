@@ -33,19 +33,18 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerMain));
             this.Btn_start = new System.Windows.Forms.Button();
             this.Rtxt_chat = new System.Windows.Forms.RichTextBox();
-            this.listBox_user = new System.Windows.Forms.ListBox();
             this.dgv_info = new System.Windows.Forms.DataGridView();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.username = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.connectToServerCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.quitQToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disconnectDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quitQToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.settingSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_info)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -73,16 +72,6 @@
             this.Rtxt_chat.TabIndex = 27;
             this.Rtxt_chat.Text = "";
             this.Rtxt_chat.TextChanged += new System.EventHandler(this.Rtxt_chat_TextChanged);
-            // 
-            // listBox_user
-            // 
-            this.listBox_user.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.listBox_user.FormattingEnabled = true;
-            this.listBox_user.ItemHeight = 21;
-            this.listBox_user.Location = new System.Drawing.Point(611, 386);
-            this.listBox_user.Name = "listBox_user";
-            this.listBox_user.Size = new System.Drawing.Size(161, 151);
-            this.listBox_user.TabIndex = 28;
             // 
             // dgv_info
             // 
@@ -112,29 +101,8 @@
             this.dgv_info.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgv_info.RowTemplate.Height = 23;
             this.dgv_info.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgv_info.Size = new System.Drawing.Size(593, 150);
+            this.dgv_info.Size = new System.Drawing.Size(760, 150);
             this.dgv_info.TabIndex = 29;
-            // 
-            // toolStrip1
-            // 
-            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSplitButton1,
-            this.toolStripDropDownButton1});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.toolStrip1.Size = new System.Drawing.Size(784, 25);
-            this.toolStrip1.TabIndex = 30;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 539);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(784, 22);
-            this.statusStrip1.TabIndex = 31;
-            this.statusStrip1.Text = "statusStrip1";
             // 
             // id
             // 
@@ -153,6 +121,19 @@
             this.ip.HeaderText = "IP";
             this.ip.Name = "ip";
             this.ip.ReadOnly = true;
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSplitButton1,
+            this.toolStripDropDownButton1});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+            this.toolStrip1.Size = new System.Drawing.Size(784, 25);
+            this.toolStrip1.TabIndex = 30;
+            this.toolStrip1.Text = "toolStrip1";
             // 
             // toolStripSplitButton1
             // 
@@ -173,19 +154,19 @@
             this.connectToServerCToolStripMenuItem.Name = "connectToServerCToolStripMenuItem";
             this.connectToServerCToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.connectToServerCToolStripMenuItem.Text = "&Connect to server";
-            this.connectToServerCToolStripMenuItem.Click += new System.EventHandler(this.connectToServerCToolStripMenuItem_Click);
-            // 
-            // quitQToolStripMenuItem
-            // 
-            this.quitQToolStripMenuItem.Name = "quitQToolStripMenuItem";
-            this.quitQToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
-            this.quitQToolStripMenuItem.Text = "&Quit";
+            this.connectToServerCToolStripMenuItem.Click += new System.EventHandler(this.ConnectToServer_Click);
             // 
             // disconnectDToolStripMenuItem
             // 
             this.disconnectDToolStripMenuItem.Name = "disconnectDToolStripMenuItem";
             this.disconnectDToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.disconnectDToolStripMenuItem.Text = "&Disconnect";
+            // 
+            // quitQToolStripMenuItem
+            // 
+            this.quitQToolStripMenuItem.Name = "quitQToolStripMenuItem";
+            this.quitQToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
+            this.quitQToolStripMenuItem.Text = "&Quit";
             // 
             // toolStripDropDownButton1
             // 
@@ -202,8 +183,16 @@
             // settingSToolStripMenuItem
             // 
             this.settingSToolStripMenuItem.Name = "settingSToolStripMenuItem";
-            this.settingSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.settingSToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.settingSToolStripMenuItem.Text = "&Setting";
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 539);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(784, 22);
+            this.statusStrip1.TabIndex = 31;
+            this.statusStrip1.Text = "statusStrip1";
             // 
             // ServerMain
             // 
@@ -213,7 +202,6 @@
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.dgv_info);
-            this.Controls.Add(this.listBox_user);
             this.Controls.Add(this.Rtxt_chat);
             this.Controls.Add(this.Btn_start);
             this.MinimizeBox = false;
@@ -231,7 +219,6 @@
         #endregion
         private System.Windows.Forms.Button Btn_start;
         private System.Windows.Forms.RichTextBox Rtxt_chat;
-        private System.Windows.Forms.ListBox listBox_user;
         private System.Windows.Forms.DataGridView dgv_info;
         private System.Windows.Forms.DataGridViewTextBoxColumn id;
         private System.Windows.Forms.DataGridViewTextBoxColumn username;

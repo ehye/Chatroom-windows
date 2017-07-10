@@ -8,13 +8,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace Client
 {
     public partial class ClientMain : Form
     {
-        bool isRunning = false;
+        volatile bool isRunning = false;
+        volatile bool isStop = false;
         TcpClient client;
         IPEndPoint ipe = ConnectionData.Ipe;
 
@@ -37,9 +37,10 @@ namespace Client
                 client.Connect(ipe);
 
                 var stream = client.GetStream();
-                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, "127.0.0.1", true);
-                IFormatter formatter = new BinaryFormatter();
+                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, "LocalIP", true);
+                var formatter = new BinaryFormatter();
                 formatter.Serialize(stream, chatClient);
+                statusLabel_conInfo.Text = "Connected to" + ipe.ToString();
                 Console.WriteLine("Socket connected to {0}", ipe.ToString());
             }
             catch (Exception ex)
@@ -58,10 +59,9 @@ namespace Client
                 var bytes = new byte[1024];
                 var data = String.Empty;
                 var stream = client.GetStream();
-                //int i;
-                //while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 for (int i; client.Connected && (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
                 {
+                    if (isStop) break;
                     data = Encoding.UTF8.GetString(bytes, 0, i);
                     Console.WriteLine("Echoed text = {0}", data);
 
@@ -99,20 +99,24 @@ namespace Client
             else
             {
                 Btn_connect.Text = "Connect";
-                // Close everything.
-                Console.WriteLine("Close everything.");
+                isStop = true;
                 client.Close();
             }
-            Txt_username.Enabled = !Txt_username.Enabled;
-            Txt_password.Enabled = !Txt_password.Enabled;
-            Txt_host.ReadOnly = !Txt_host.ReadOnly;
-            Txt_port.ReadOnly = !Txt_port.ReadOnly;
-            Btn_send.Enabled = !Btn_send.Enabled;
+
+            Txt_username.Enabled    = !Txt_username.Enabled;
+            Txt_password.Enabled    = !Txt_password.Enabled;
+            Txt_host.ReadOnly       = !Txt_host.ReadOnly;
+            Txt_port.ReadOnly       = !Txt_port.ReadOnly;
+            Btn_send.Enabled        = !Btn_send.Enabled;
         }
 
         private void Btn_send_Click(object sender, EventArgs e)
         {
-            Send();
+            if (!Txt_send.Text.Equals(String.Empty))
+            {
+                Send();
+            }
+
             Txt_send.Clear();
             Txt_send.Focus();
         }
