@@ -34,9 +34,6 @@
             this.Btn_start = new System.Windows.Forms.Button();
             this.Rtxt_chat = new System.Windows.Forms.RichTextBox();
             this.dgv_info = new System.Windows.Forms.DataGridView();
-            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.username = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.connectToServerCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,6 +42,9 @@
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.settingSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.username = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_info)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -77,8 +77,11 @@
             // 
             this.dgv_info.AllowUserToAddRows = false;
             this.dgv_info.AllowUserToDeleteRows = false;
+            this.dgv_info.AllowUserToResizeRows = false;
+            this.dgv_info.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dgv_info.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dgv_info.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.dgv_info.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dgv_info.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
@@ -103,24 +106,6 @@
             this.dgv_info.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgv_info.Size = new System.Drawing.Size(760, 150);
             this.dgv_info.TabIndex = 29;
-            // 
-            // id
-            // 
-            this.id.HeaderText = "ID";
-            this.id.Name = "id";
-            this.id.ReadOnly = true;
-            // 
-            // username
-            // 
-            this.username.HeaderText = "Username";
-            this.username.Name = "username";
-            this.username.ReadOnly = true;
-            // 
-            // ip
-            // 
-            this.ip.HeaderText = "IP";
-            this.ip.Name = "ip";
-            this.ip.ReadOnly = true;
             // 
             // toolStrip1
             // 
@@ -194,6 +179,27 @@
             this.statusStrip1.TabIndex = 31;
             this.statusStrip1.Text = "statusStrip1";
             // 
+            // id
+            // 
+            this.id.HeaderText = "ID";
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            this.id.Width = 48;
+            // 
+            // username
+            // 
+            this.username.HeaderText = "Username";
+            this.username.Name = "username";
+            this.username.ReadOnly = true;
+            this.username.Width = 96;
+            // 
+            // ip
+            // 
+            this.ip.HeaderText = "IP : Port";
+            this.ip.Name = "ip";
+            this.ip.ReadOnly = true;
+            this.ip.Width = 83;
+            // 
             // ServerMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -220,9 +226,6 @@
         private System.Windows.Forms.Button Btn_start;
         private System.Windows.Forms.RichTextBox Rtxt_chat;
         private System.Windows.Forms.DataGridView dgv_info;
-        private System.Windows.Forms.DataGridViewTextBoxColumn id;
-        private System.Windows.Forms.DataGridViewTextBoxColumn username;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ip;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripSplitButton1;
@@ -231,6 +234,9 @@
         private System.Windows.Forms.ToolStripMenuItem disconnectDToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem settingSToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn username;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ip;
     }
 }
 

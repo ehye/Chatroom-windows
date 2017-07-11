@@ -8,7 +8,7 @@ namespace ComLib
 {
     public class ConnectionData
     {
-        public static System.Net.IPAddress ServerIP { get; set; } = System.Net.IPAddress.Parse("127.0.0.1");
+        public static System.Net.IPAddress ServerIP { get; set; } = System.Net.IPAddress.Parse("192.168.2.104");
         public static int ServerPort { get; set; } = 6017;
         public static System.Net.IPEndPoint Ipe { get; set; } = new System.Net.IPEndPoint(ServerIP, ServerPort);
     }

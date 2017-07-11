@@ -1,5 +1,6 @@
 ﻿using ComLib;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
@@ -13,11 +14,12 @@ namespace Server
 {
     public partial class ServerMain : Form
     {
-        volatile bool isStarting = false;
-        volatile bool isStop = false;
-        static int USERCOUNT = 10;
         TcpListener listener;
-        ChatClient[] chatClients;
+        List<ChatClient> chatClients;
+        List<TcpClient> tcpClients;
+        //static int USERCOUNT = 10;
+        volatile bool isStop = false;
+        volatile bool isStarting = false;
         IPEndPoint ipe = ConnectionData.Ipe;
 
         public ServerMain()
@@ -31,61 +33,50 @@ namespace Server
             this.Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
         }
 
-        private void Listen()
+        private void RevInfo()
         {
-            //TcpClient handler = null;
-            IFormatter formatter = new BinaryFormatter();
-            listener = new TcpListener(ipe);
-            listener.Start();
-            Console.WriteLine("Waiting for a connection...");
-
             while (true)
             {
-                try
-                {
-                    // Deserilaize the client objet form stream.
-                    var data        = String.Empty;
-                    var bytes       = new byte[1024];
-                    var handler     = listener.AcceptTcpClient();
-                    var stream      = handler.GetStream();
-                    var chatClient  = (ChatClient)formatter.Deserialize(stream);
-                    stream.Flush();
+                // Deserilaize the client objet form stream.
+                var formatter   =   new BinaryFormatter();
+                var handler     =   listener.AcceptTcpClient();
+                var stream      =   handler.GetStream();
+                var chatClient  =   (ChatClient)formatter.Deserialize(stream);
 
-                    chatClients.SetValue(chatClient, --USERCOUNT);
-                    dgv_info.Rows.Add("id", chatClient.Username, chatClient.Ip);
+                chatClients.Add(chatClient);
+                tcpClients.Add(handler);
+                stream.Flush();
 
-                    // Loop to receive all the data sent by the client.
-                    for (int i; (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
-                    {
-                        if (isStop) break;
+                dgv_info.Rows.Add("id", chatClient.Username, chatClient.Ip);
+            }
+        }
 
-                        data = Encoding.UTF8.GetString(bytes, 0, i);
-                        ShowMessage(chatClient.Username, data);
-                        Console.WriteLine("Text received : {0}", data);
+        private void Listen()
+        {
+            while (true)
+            {
+                /*
+                 * ToArray() is thread-safe
+                 * but O(n) storage require
+                 */
+                foreach (var client in tcpClients.ToArray())
+                {
+                    if (isStop) break;
 
-                        #region Send back a response
-                        //data = data.ToUpper();
-                        //byte[] msg = Encoding.UTF8.GetBytes(data);
-                        //stream.Write(msg, 0, msg.Length);
-                        //Console.WriteLine("Echo: {0}", data);
-                        #endregion
-                    }
-                }
-                catch (SocketException)
-                {
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                finally
-                {
-                    //if (handler != null)
-                    //{
-                    //    handler.Close();
-                    //    Console.WriteLine("close handler");
-                    //}
+                    var stream  =   client.GetStream();
+                    var bytes   =   new byte[1024];
+                    var count   =   stream.Read(bytes, 0, bytes.Length);
+                    var user    =   chatClients.Find(p => p.Ip == client.Client.RemoteEndPoint.ToString());
+                    var data    =   Encoding.UTF8.GetString(bytes, 0, count);
+
+                    ShowMessage(user.Username, data);
+
+                    #region Send back a response
+                    //data = data.ToUpper();
+                    //byte[] msg = Encoding.UTF8.GetBytes(data);
+                    //stream.Write(msg, 0, msg.Length);
+                    //Console.WriteLine("Echo: {0}", data);
+                    #endregion
                 }
             }
         }
@@ -102,11 +93,18 @@ namespace Server
             if (isStarting)
             {
                 Btn_start.Text = "Stop";
+                chatClients = new List<ChatClient>();
+                tcpClients  = new List<TcpClient>();
+                listener    = new TcpListener(ipe);
+                listener.Start();
+                //Console.WriteLine("Waiting for a connection...");
 
-                // TODO: client object
-                chatClients = new ChatClient[10];
+                var tRev = new Thread(RevInfo);
+                tRev.Name = "RevInfo";
+                tRev.Start();
 
-                Thread tListen = new Thread(Listen);
+                var tListen = new Thread(Listen);
+                tListen.Name = "Listen";
                 tListen.Start();
             }
             else
