@@ -1,7 +1,9 @@
 ﻿using ComLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
@@ -21,6 +23,10 @@ namespace Server
         volatile bool isStop = false;
         volatile bool isStarting = false;
         IPEndPoint ipe = ConnectionData.Ipe;
+        Dictionary<long, string> kvp_message;
+
+
+        List<MsgPackage> packageList = new List<MsgPackage>();
 
         public ServerMain()
         {
@@ -38,10 +44,10 @@ namespace Server
             while (true)
             {
                 // Deserilaize the client objet form stream.
-                var formatter   =   new BinaryFormatter();
-                var handler     =   listener.AcceptTcpClient();
-                var stream      =   handler.GetStream();
-                var chatClient  =   (ChatClient)formatter.Deserialize(stream);
+                var formatter   = new BinaryFormatter();
+                var handler     = listener.AcceptTcpClient();
+                var stream      = handler.GetStream();
+                var chatClient  = (ChatClient)formatter.Deserialize(stream);
 
                 chatClients.Add(chatClient);
                 tcpClients.Add(handler);
@@ -59,17 +65,23 @@ namespace Server
                  * ToArray() is thread-safe
                  * but O(n) storage require
                  */
-                foreach (var client in tcpClients.ToArray())
+                //foreach (var client in tcpClients.ToArray())
+                for (int i = 0; i < tcpClients.Count; i++)
                 {
                     if (isStop) break;
 
-                    var stream  =   client.GetStream();
-                    var bytes   =   new byte[1024];
-                    var count   =   stream.Read(bytes, 0, bytes.Length);
-                    var user    =   chatClients.Find(p => p.Ip == client.Client.RemoteEndPoint.ToString());
-                    var data    =   Encoding.UTF8.GetString(bytes, 0, count);
+                    //var stream  = client.GetStream();
+                    var stream  = tcpClients[i].GetStream();
+                    var bytes   = new byte[1024];
+                    var count   = stream.Read(bytes, 0, bytes.Length);
+                    var user    = chatClients.Find(p => p.Ip == tcpClients[i].Client.RemoteEndPoint.ToString());
+                    var data    = Encoding.UTF8.GetString(bytes, 0, count);
+                    string[] s  = data.Split(new Char[] { '\t' });
+                    //kvp_message.Add(Int64.Parse(s[1]), s[0]);
 
-                    ShowMessage(user.Username, data);
+                    MsgPackage ms = new MsgPackage(Int64.Parse(s[1]), user.Username, s[0]);
+                    packageList.Add(ms);
+
 
                     #region Send back a response
                     //data = data.ToUpper();
@@ -78,13 +90,32 @@ namespace Server
                     //Console.WriteLine("Echo: {0}", data);
                     #endregion
                 }
+                ShowMessage();
             }
         }
 
-        private void ShowMessage(string username, string message)
+        private void ShowMessage()
         {
-            Rtxt_chat.AppendText(Environment.NewLine + username + " " + DateTime.Now, Color.Blue);
-            Rtxt_chat.AppendText(Environment.NewLine + message + Environment.NewLine);
+            // sort use Linq
+            //var sortedList = from ticks in packageList
+            //                 orderby ticks ascending
+            //                 select ticks;
+            // sort use interface
+            packageList.Sort(new TicksAscOrder());
+
+            //Rtxt_chat.AppendText(Environment.NewLine + username + " " + DateTime.Now.ToShortDateString()
+            //    + " " + DateTime.FromBinary(Int64.Parse(s[1])).ToLongTimeString(), Color.Blue);
+            //Rtxt_chat.AppendText(Environment.NewLine + s[0] + Environment.NewLine);
+
+            foreach (var item in packageList)
+            {
+
+                Rtxt_chat.AppendText(Environment.NewLine + item.username +" " + DateTime.Now.ToShortDateString()
+                    + " " + DateTime.FromBinary(item.ticks).ToLongTimeString(), Color.Blue);
+                Rtxt_chat.AppendText(Environment.NewLine + item.msg + Environment.NewLine);
+            }
+
+            packageList.Clear();
         }
 
         private void Btn_start_Click(object sender, EventArgs e)
@@ -93,18 +124,23 @@ namespace Server
             if (isStarting)
             {
                 Btn_start.Text = "Stop";
+                kvp_message = new Dictionary<long, string>();
                 chatClients = new List<ChatClient>();
-                tcpClients  = new List<TcpClient>();
-                listener    = new TcpListener(ipe);
+                tcpClients = new List<TcpClient>();
+                listener = new TcpListener(ipe);
                 listener.Start();
                 //Console.WriteLine("Waiting for a connection...");
 
-                var tRev = new Thread(RevInfo);
-                tRev.Name = "RevInfo";
+                var tRev = new Thread(RevInfo)
+                {
+                    Name = "RevInfo"
+                };
                 tRev.Start();
 
-                var tListen = new Thread(Listen);
-                tListen.Name = "Listen";
+                var tListen = new Thread(Listen)
+                {
+                    Name = "Listen"
+                };
                 tListen.Start();
             }
             else
@@ -126,6 +162,28 @@ namespace Server
         private void ConnectToServer_Click(object sender, EventArgs e)
         {
             Btn_start.PerformClick();
+        }
+    }
+
+    public struct MsgPackage
+    {
+        public long ticks;
+        public string username;
+        public string msg;
+
+        public MsgPackage(long ticks, string username, string msg)
+        {
+            this.ticks = ticks;
+            this.username = username;
+            this.msg = msg;
+        }
+    }
+
+    public class TicksAscOrder : IComparer<MsgPackage>
+    {
+        public int Compare(MsgPackage x, MsgPackage y)
+        {
+            return x.ticks.CompareTo(y.ticks);
         }
     }
 

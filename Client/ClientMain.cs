@@ -14,6 +14,7 @@ namespace Client
     {
         volatile bool isRunning = false;
         volatile bool isStop = false;
+        const char SPLIT = '\t';
         TcpClient client;
         IPEndPoint ipe = ConnectionData.Ipe;
 
@@ -73,7 +74,7 @@ namespace Client
 
         private void Send()
         {
-            var msg = Encoding.UTF8.GetBytes(Txt_send.Text);
+            var msg = Encoding.UTF8.GetBytes(Txt_send.Text + SPLIT + DateTime.Now.Ticks);
             if (client.Connected)
             {
                 client.Client.Send(msg);
