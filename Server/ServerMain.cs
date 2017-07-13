@@ -16,17 +16,15 @@ namespace Server
 {
     public partial class ServerMain : Form
     {
-        TcpListener listener;
-        List<ChatClient> chatClients;
-        List<TcpClient> tcpClients;
         //static int USERCOUNT = 10;
         volatile bool isStop = false;
         volatile bool isStarting = false;
+        TcpListener listener;
+        List<TcpClient> socketsList;
+        List<ChatClient> clientsList;
+        List<MsgPackage> messageList;
         IPEndPoint ipe = ConnectionData.Ipe;
         Dictionary<long, string> kvp_message;
-
-
-        List<MsgPackage> packageList = new List<MsgPackage>();
 
         public ServerMain()
         {
@@ -37,23 +35,35 @@ namespace Server
         private void ServerMain_Load(object sender, EventArgs e)
         {
             this.Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
+
+            kvp_message = new Dictionary<long, string>();
+            clientsList = new List<ChatClient>();
+            socketsList = new List<TcpClient>();
+            messageList = new List<MsgPackage>();
+            listener = new TcpListener(ipe);
         }
 
         private void RevInfo()
         {
             while (true)
             {
-                // Deserilaize the client objet form stream.
-                var formatter   = new BinaryFormatter();
-                var handler     = listener.AcceptTcpClient();
-                var stream      = handler.GetStream();
-                var chatClient  = (ChatClient)formatter.Deserialize(stream);
+                try
+                {
+                    // Deserilaize the client objet form stream.
+                    var formatter = new BinaryFormatter();
+                    var handler = listener.AcceptTcpClient();
+                    var stream = handler.GetStream();
+                    var client = (ChatClient)formatter.Deserialize(stream);
+                    clientsList.Add(client);
+                    socketsList.Add(handler);
+                    stream.Flush();
 
-                chatClients.Add(chatClient);
-                tcpClients.Add(handler);
-                stream.Flush();
-
-                dgv_info.Rows.Add("id", chatClient.Username, chatClient.Ip);
+                    dgv_info.Rows.Add("id", client.Username, client.Ip);
+                }
+                catch (SocketException)
+                {
+                    break;
+                }
             }
         }
 
@@ -65,23 +75,27 @@ namespace Server
                  * ToArray() is thread-safe
                  * but O(n) storage require
                  */
+
                 //foreach (var client in tcpClients.ToArray())
-                for (int i = 0; i < tcpClients.Count; i++)
+
+                for (int i = 0; i < socketsList.Count; i++)
                 {
-                    if (isStop) break;
-
-                    //var stream  = client.GetStream();
-                    var stream  = tcpClients[i].GetStream();
-                    var bytes   = new byte[1024];
-                    var count   = stream.Read(bytes, 0, bytes.Length);
-                    var user    = chatClients.Find(p => p.Ip == tcpClients[i].Client.RemoteEndPoint.ToString());
-                    var data    = Encoding.UTF8.GetString(bytes, 0, count);
-                    string[] s  = data.Split(new Char[] { '\t' });
-                    //kvp_message.Add(Int64.Parse(s[1]), s[0]);
-
-                    MsgPackage ms = new MsgPackage(Int64.Parse(s[1]), user.Username, s[0]);
-                    packageList.Add(ms);
-
+                    try
+                    {
+                        var bytes = new byte[1024];
+                        var stream = socketsList[i].GetStream();
+                        stream.ReadTimeout = 10;
+                        var count = stream.Read(bytes, 0, bytes.Length);
+                        var user = clientsList.Find(p => p.Ip == socketsList[i].Client.RemoteEndPoint.ToString());
+                        var data = Encoding.UTF8.GetString(bytes, 0, count);
+                        string[] s = data.Split(new string[] { ChatClient.SPLIT }, StringSplitOptions.RemoveEmptyEntries);
+                        MsgPackage ms = new MsgPackage(Int64.Parse(s[1]), user.Username, s[0], user.Ip);
+                        messageList.Add(ms);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
                     #region Send back a response
                     //data = data.ToUpper();
@@ -90,7 +104,28 @@ namespace Server
                     //Console.WriteLine("Echo: {0}", data);
                     #endregion
                 }
+                if (isStop) break;
+
+                //Boardcast();
                 ShowMessage();
+            }
+        }
+
+        private void Boardcast()
+        {
+            while (true)
+            {
+                for (int j = 0; j < messageList.Count; j++)
+                {
+                    for (int i = 0; i < socketsList.Count; i++)
+                    {
+                        var bytes = Encoding.UTF8.GetBytes(messageList[i].msg);
+                        if (bytes.Length != 0)
+                            socketsList[i].Client.Send(bytes);
+                    }
+                    //byte[] msg = Encoding.UTF8.GetBytes(data);
+                    //client.Client.Send(msg);
+                }
             }
         }
 
@@ -100,22 +135,33 @@ namespace Server
             //var sortedList = from ticks in packageList
             //                 orderby ticks ascending
             //                 select ticks;
+
             // sort use interface
-            packageList.Sort(new TicksAscOrder());
+            messageList.Sort(new TicksAscOrder());
 
-            //Rtxt_chat.AppendText(Environment.NewLine + username + " " + DateTime.Now.ToShortDateString()
-            //    + " " + DateTime.FromBinary(Int64.Parse(s[1])).ToLongTimeString(), Color.Blue);
-            //Rtxt_chat.AppendText(Environment.NewLine + s[0] + Environment.NewLine);
-
-            foreach (var item in packageList)
+            foreach (var item in messageList)
             {
+                // show to server
+                Rtxt_chat.AppendText(Environment.NewLine + item.username + "> ", Color.Blue);
+                Rtxt_chat.AppendText(item.msg);
 
-                Rtxt_chat.AppendText(Environment.NewLine + item.username +" " + DateTime.Now.ToShortDateString()
-                    + " " + DateTime.FromBinary(item.ticks).ToLongTimeString(), Color.Blue);
-                Rtxt_chat.AppendText(Environment.NewLine + item.msg + Environment.NewLine);
+                // boardcast
+                var BCgroup = from client in clientsList
+                              where client.Username != item.username
+                              select client;
+                //=Console.WriteLine("linq");
+
+                foreach (var socket in socketsList)
+                {
+                    if (item.ip != socket.Client.RemoteEndPoint.ToString())
+                    {
+                        Byte[] bytes = Encoding.UTF8.GetBytes(item.username + ChatClient.SPLIT + item.msg);
+                        socket.Client.Send(bytes);
+                    }
+                }
             }
 
-            packageList.Clear();
+            messageList.Clear();
         }
 
         private void Btn_start_Click(object sender, EventArgs e)
@@ -123,13 +169,8 @@ namespace Server
             isStarting = !isStarting;
             if (isStarting)
             {
-                Btn_start.Text = "Stop";
-                kvp_message = new Dictionary<long, string>();
-                chatClients = new List<ChatClient>();
-                tcpClients = new List<TcpClient>();
-                listener = new TcpListener(ipe);
                 listener.Start();
-                //Console.WriteLine("Waiting for a connection...");
+                Console.WriteLine("Waiting for a connection...");
 
                 var tRev = new Thread(RevInfo)
                 {
@@ -142,14 +183,22 @@ namespace Server
                     Name = "Listen"
                 };
                 tListen.Start();
+
+                var tBC = new Thread(Boardcast)
+                {
+                    Name = "Boardcast"
+                };
+                //tBC.Start();
+
+                Btn_start.Text = "Stop";
             }
             else
             {
-                Btn_start.Text = "Start";
                 isStop = true;
                 listener.Stop();
-                chatClients = null;
+                clientsList.Clear();
                 dgv_info.Rows.Clear();
+                Btn_start.Text = "Start";
             }
         }
 
@@ -170,12 +219,18 @@ namespace Server
         public long ticks;
         public string username;
         public string msg;
+        public string ip;
 
-        public MsgPackage(long ticks, string username, string msg)
+        //public long ticks { get => ticks; private set => ticks = value; }
+        //public string username { get => username; private set => username = value; }
+        //public string msg { get => msg; private set => msg = value; }
+
+        public MsgPackage(long ticks, string username, string msg, string ip)
         {
             this.ticks = ticks;
             this.username = username;
             this.msg = msg;
+            this.ip = ip;
         }
     }
 

@@ -14,7 +14,6 @@ namespace Client
     {
         volatile bool isRunning = false;
         volatile bool isStop = false;
-        const char SPLIT = '\t';
         TcpClient client;
         IPEndPoint ipe = ConnectionData.Ipe;
 
@@ -61,7 +60,7 @@ namespace Client
                 var bytes = new byte[1024];
                 var data = String.Empty;
                 var stream = client.GetStream();
-                for (int i; client.Connected && (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
+                for (int i; /*client.Connected && */(i = stream.Read(bytes, 0, bytes.Length)) != 0;)
                 {
                     if (isStop) break;
 
@@ -74,18 +73,27 @@ namespace Client
 
         private void Send()
         {
-            var msg = Encoding.UTF8.GetBytes(Txt_send.Text + SPLIT + DateTime.Now.Ticks);
+            var msg = Encoding.UTF8.GetBytes(Txt_send.Text + ChatClient.SPLIT + DateTime.Now.Ticks);
             if (client.Connected)
             {
                 client.Client.Send(msg);
             }
-            ShowMessage(Rtxt_chat.Text);
+            ShowMessage(Txt_send.Text);
         }
 
         private void ShowMessage(string data)
         {
-            Rtxt_chat.AppendText(Environment.NewLine + Txt_username.Text + " " + DateTime.Now, Color.Blue);
-            Rtxt_chat.AppendText(Environment.NewLine + Txt_send.Text + Environment.NewLine, Color.Black);
+            string[] msg = data.Split(new string[] { ChatClient.SPLIT }, StringSplitOptions.RemoveEmptyEntries);
+            if (msg.Length == 1)
+            {
+                Rtxt_chat.AppendText(Environment.NewLine + Txt_username.Text + " " + DateTime.Now, Color.Blue);
+                Rtxt_chat.AppendText(Environment.NewLine + Txt_send.Text + Environment.NewLine, Color.Black);
+            }
+            else
+            {
+                Rtxt_chat.AppendText(Environment.NewLine + msg[0] + " " + DateTime.Now, Color.Blue);
+                Rtxt_chat.AppendText(Environment.NewLine + msg[1] + Environment.NewLine, Color.Black);
+            }
         }
 
         private void Btn_connect_Click(object sender, EventArgs e)
@@ -93,16 +101,20 @@ namespace Client
             isRunning = !isRunning;
             if (isRunning)
             {
-                Btn_connect.Text = "Disconnect";
                 Connect();
-                var tReceive = new Thread(Receive);
-                tReceive.Start();
+                var tRev = new Thread(Receive)
+                {
+                    Name = "Receive"
+                };
+                tRev.Start();
+
+                Btn_connect.Text = "Disconnect";
             }
             else
             {
-                Btn_connect.Text = "Connect";
                 isStop = true;
                 client.Close();
+                Btn_connect.Text = "Connect";
             }
 
             Txt_username.Enabled = !Txt_username.Enabled;
