@@ -8,7 +8,7 @@ namespace ComLib
         public static string SPLIT { get; } = ":]swx";
         public string Username { get; private set; }
         public string Password { get; private set; }
-        public string Ip { get; private set; } = ConnectionData.ServerIP.ToString();
+        public string Ip { get; private set; }
 
         public ChatClient(string username, string password, string ip, bool connect)
         {

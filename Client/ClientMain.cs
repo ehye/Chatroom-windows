@@ -2,6 +2,7 @@ using ComLib;
 using System;
 using System.Drawing;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -15,7 +16,9 @@ namespace Client
         volatile bool isRunning = false;
         volatile bool isStop = false;
         TcpClient client;
-        IPEndPoint ipe = ConnectionData.Ipe;
+        //IPEndPoint ipe = ConnectionData.Ipe;
+        IPEndPoint ipe;
+
 
         public ClientMain()
         {
@@ -26,23 +29,26 @@ namespace Client
         private void ClientMain_Load(object sender, EventArgs e)
         {
             this.Text = Environment.MachineName + " Chat on " + Environment.OSVersion.ToString();
-            Txt_host.Text = ConnectionData.ServerIP.ToString();
-            Txt_port.Text = ConnectionData.ServerPort.ToString();
         }
 
         private void Connect()
         {
+            ipe = new IPEndPoint(IPAddress.Parse(Txt_host.Text), Int16.Parse(Txt_port.Text));
+            client = new TcpClient();
+
             try
             {
-                client = new TcpClient();
-                client.Connect(ipe);
-
+                client.Connect(this.ipe);
                 var stream = client.GetStream();
-                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, client.Client.LocalEndPoint.ToString(), true);
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, chatClient);
+                var innerip = client.Client.LocalEndPoint.ToString();
+                string[] s = client.Client.LocalEndPoint.ToString().Split(new Char[] { ':' });
+                var port = s[1];
+                var publicEndPoint = Lib.GetPubIp() + ":" + port;
+                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, publicEndPoint, true);
+                new BinaryFormatter().Serialize(stream, chatClient);
+
                 statusLabel_conInfo.Text = "Connected to" + ipe.ToString();
-                //Console.WriteLine("Socket connected to {0}", ipe.ToString());
+                //Console.WriteLine("Socket connected to {0}", client.Client.RemoteEndPoint.ToString());
             }
             catch (Exception ex)
             {
@@ -60,7 +66,7 @@ namespace Client
                 var bytes = new byte[1024];
                 var data = String.Empty;
                 var stream = client.GetStream();
-                for (int i; /*client.Connected && */(i = stream.Read(bytes, 0, bytes.Length)) != 0;)
+                for (int i; (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
                 {
                     if (isStop) break;
 
@@ -77,6 +83,7 @@ namespace Client
             if (client.Connected)
             {
                 client.Client.Send(msg);
+                //MessageBox.Show(client.Client.RemoteEndPoint.ToString());
             }
             ShowMessage(Txt_send.Text);
         }

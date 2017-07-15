@@ -23,7 +23,7 @@ namespace Server
         List<TcpClient> socketsList;
         List<ChatClient> clientsList;
         List<MsgPackage> messageList;
-        IPEndPoint ipe = ConnectionData.Ipe;
+        IPEndPoint ipe = ServerConf.Ipe;
         Dictionary<long, string> kvp_message;
 
         public ServerMain()
@@ -53,7 +53,7 @@ namespace Server
                     var formatter = new BinaryFormatter();
                     var handler = listener.AcceptTcpClient();
                     var stream = handler.GetStream();
-                    var client = (ChatClient)formatter.Deserialize(stream);
+                    ChatClient client = (ChatClient)formatter.Deserialize(stream);
                     clientsList.Add(client);
                     socketsList.Add(handler);
                     stream.Flush();
@@ -92,9 +92,13 @@ namespace Server
                         MsgPackage ms = new MsgPackage(Int64.Parse(s[1]), user.Username, s[0], user.Ip);
                         messageList.Add(ms);
                     }
-                    catch
+                    catch (System.IO.IOException)
                     {
                         continue;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
                     }
 
                     #region Send back a response
@@ -149,7 +153,6 @@ namespace Server
                 var BCgroup = from client in clientsList
                               where client.Username != item.username
                               select client;
-                //=Console.WriteLine("linq");
 
                 foreach (var socket in socketsList)
                 {

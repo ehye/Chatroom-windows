@@ -62,7 +62,7 @@
             this.Txt_username.Name = "Txt_username";
             this.Txt_username.Size = new System.Drawing.Size(131, 29);
             this.Txt_username.TabIndex = 21;
-            this.Txt_username.Text = "yjw";
+            this.Txt_username.Text = "user";
             // 
             // Txt_send
             // 
@@ -134,7 +134,7 @@
             this.Txt_host.Name = "Txt_host";
             this.Txt_host.Size = new System.Drawing.Size(131, 29);
             this.Txt_host.TabIndex = 21;
-            this.Txt_host.Text = "127.0.0.1";
+            this.Txt_host.Text = "58.23.42.121";
             // 
             // Txt_port
             // 
