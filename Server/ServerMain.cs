@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -23,8 +24,7 @@ namespace Server
         List<TcpClient> socketsList;
         List<ChatClient> clientsList;
         List<MsgPackage> messageList;
-        IPEndPoint ipe = ServerConf.Ipe;
-        Dictionary<long, string> kvp_message;
+        Dictionary<long, string> kvp_tick_message;
 
         public ServerMain()
         {
@@ -36,11 +36,13 @@ namespace Server
         {
             this.Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
 
-            kvp_message = new Dictionary<long, string>();
+            Combo_IpGroup.Items.AddRange(Lib.GetLocalIPAddresses());
+
+
+            kvp_tick_message = new Dictionary<long, string>();
             clientsList = new List<ChatClient>();
             socketsList = new List<TcpClient>();
             messageList = new List<MsgPackage>();
-            listener = new TcpListener(ipe);
         }
 
         private void RevInfo()
@@ -54,11 +56,24 @@ namespace Server
                     var handler = listener.AcceptTcpClient();
                     var stream = handler.GetStream();
                     ChatClient client = (ChatClient)formatter.Deserialize(stream);
-                    clientsList.Add(client);
-                    socketsList.Add(handler);
-                    stream.Flush();
 
-                    dgv_info.Rows.Add("id", client.Username, client.Ip);
+                    if (client.IsConnect)
+                    {
+                        clientsList.Add(client);
+                        socketsList.Add(handler);
+                        dgv_info.Rows.Add("id", client.Username, client.Ip);
+                    }
+                    else
+                    {
+                        clientsList.Remove(clientsList.Find(p => p.Username == client.Username));
+                        //socketsList.Remove(socketsList.Find(p => p.Client.RemoteEndPoint == client.Ip));
+                        DataSet ds = new DataSet();
+                        //ds.f
+
+                        //dgv_info.DataSource 
+                    }
+
+                    stream.Flush();
                 }
                 catch (SocketException)
                 {
@@ -75,7 +90,6 @@ namespace Server
                  * ToArray() is thread-safe
                  * but O(n) storage require
                  */
-
                 //foreach (var client in tcpClients.ToArray())
 
                 for (int i = 0; i < socketsList.Count; i++)
@@ -83,8 +97,9 @@ namespace Server
                     try
                     {
                         var bytes = new byte[1024];
+                        if (!socketsList[i].Client.Connected) continue;
                         var stream = socketsList[i].GetStream();
-                        stream.ReadTimeout = 10;
+                        stream.ReadTimeout = 100;
                         var count = stream.Read(bytes, 0, bytes.Length);
                         var user = clientsList.Find(p => p.Ip == socketsList[i].Client.RemoteEndPoint.ToString());
                         var data = Encoding.UTF8.GetString(bytes, 0, count);
@@ -95,6 +110,10 @@ namespace Server
                     catch (System.IO.IOException)
                     {
                         continue;
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        Console.WriteLine(socketsList.ToString());
                     }
                     catch (Exception)
                     {
@@ -135,25 +154,21 @@ namespace Server
 
         private void ShowMessage()
         {
-            // sort use Linq
-            //var sortedList = from ticks in packageList
-            //                 orderby ticks ascending
-            //                 select ticks;
-
-            // sort use interface
+            // sort by sent time as ascending
             messageList.Sort(new TicksAscOrder());
 
             foreach (var item in messageList)
             {
-                // show to server
+                // show to server watch
                 Rtxt_chat.AppendText(Environment.NewLine + item.username + "> ", Color.Blue);
                 Rtxt_chat.AppendText(item.msg);
 
-                // boardcast
+                // selcet boardcast clients
                 var BCgroup = from client in clientsList
                               where client.Username != item.username
                               select client;
 
+                // boardcast
                 foreach (var socket in socketsList)
                 {
                     if (item.ip != socket.Client.RemoteEndPoint.ToString())
@@ -172,6 +187,10 @@ namespace Server
             isStarting = !isStarting;
             if (isStarting)
             {
+                var ip = IPAddress.Parse(Combo_IpGroup.Text);
+                var port = Int16.Parse(Txt_port.Text);
+                var ipe = new IPEndPoint(ip, port);
+                listener = new TcpListener(ipe);
                 listener.Start();
                 Console.WriteLine("Waiting for a connection...");
 
@@ -186,12 +205,6 @@ namespace Server
                     Name = "Listen"
                 };
                 tListen.Start();
-
-                var tBC = new Thread(Boardcast)
-                {
-                    Name = "Boardcast"
-                };
-                //tBC.Start();
 
                 Btn_start.Text = "Stop";
             }
@@ -247,7 +260,7 @@ namespace Server
 
     public static class RichTextBoxExtensions
     {
-        // Color different parts of a RichTextBox
+        // Draw different color in RichTextBox
         public static void AppendText(this RichTextBox box, string text, Color color)
         {
             box.SelectionStart = box.TextLength;

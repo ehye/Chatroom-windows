@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ComLib
 {
@@ -19,14 +15,25 @@ namespace ComLib
 
         public static string GetLocalIPAddress()
         {
+            /*
+             * 精确IP
+             * 需连接上互联网
+             */
             string localIP;
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.IP))
             {
                 socket.Connect("8.8.8.8", 65530);
-                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                var endPoint = socket.LocalEndPoint as IPEndPoint;
                 localIP = endPoint.Address.ToString();
             }
             return localIP;
+        }
+
+        public static object[] GetLocalIPAddresses()
+        {
+            string hostname = Dns.GetHostName();
+            IPHostEntry localhost = Dns.GetHostEntry(hostname);
+            return localhost.AddressList;
         }
     }
 }

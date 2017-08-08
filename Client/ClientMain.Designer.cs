@@ -134,7 +134,7 @@
             this.Txt_host.Name = "Txt_host";
             this.Txt_host.Size = new System.Drawing.Size(131, 29);
             this.Txt_host.TabIndex = 21;
-            this.Txt_host.Text = "58.23.42.121";
+            this.Txt_host.Text = "127.0.0.1";
             // 
             // Txt_port
             // 
@@ -159,7 +159,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("微软雅黑", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(402, 18);
+            this.label2.Location = new System.Drawing.Point(189, 18);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(74, 19);
             this.label2.TabIndex = 26;
@@ -169,7 +169,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("微软雅黑", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(189, 18);
+            this.label3.Location = new System.Drawing.Point(403, 18);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(70, 19);
             this.label3.TabIndex = 26;

@@ -31,29 +31,43 @@ namespace Client
             this.Text = Environment.MachineName + " Chat on " + Environment.OSVersion.ToString();
         }
 
-        private void Connect()
+        private void Connect(bool isconnect)
         {
             ipe = new IPEndPoint(IPAddress.Parse(Txt_host.Text), Int16.Parse(Txt_port.Text));
             client = new TcpClient();
+            client.Connect(this.ipe);
 
             try
             {
-                client.Connect(this.ipe);
                 var stream = client.GetStream();
-                var innerip = client.Client.LocalEndPoint.ToString();
                 string[] s = client.Client.LocalEndPoint.ToString().Split(new Char[] { ':' });
                 var port = s[1];
-                var publicEndPoint = Lib.GetPubIp() + ":" + port;
-                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, publicEndPoint, true);
+                //string publicEndPoint;
+                //if (Check_lan.Checked)
+                //{
+                //    publicEndPoint = Lib.GetLocalIPAddress() + ":" + port;
+                //}
+                //else
+                //{
+                //    publicEndPoint = Lib.GetPubIp() + ":" + port;
+                //}
+                var endPoint = Txt_host.Text + ":" + port;
+                var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, endPoint, isconnect);
                 new BinaryFormatter().Serialize(stream, chatClient);
-
-                statusLabel_conInfo.Text = "Connected to" + ipe.ToString();
-                //Console.WriteLine("Socket connected to {0}", client.Client.RemoteEndPoint.ToString());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw;
+            }
+
+            if (isconnect)
+            {
+                statusLabel_conInfo.Text = "Connected to" + ipe.ToString();
+            }
+            else
+            {
+                statusLabel_conInfo.Text = "Disconnected from" + ipe.ToString();
             }
         }
 
@@ -66,14 +80,22 @@ namespace Client
                 var bytes = new byte[1024];
                 var data = String.Empty;
                 var stream = client.GetStream();
-                for (int i; (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
+                try
                 {
-                    if (isStop) break;
+                    for (int i; (i = stream.Read(bytes, 0, bytes.Length)) != 0;)
+                    {
+                        if (isStop) break;
 
-                    data = Encoding.UTF8.GetString(bytes, 0, i);
-                    ShowMessage(data);
-                    //Console.WriteLine("Echoed text = {0}", data);
+                        data = Encoding.UTF8.GetString(bytes, 0, i);
+                        ShowMessage(data);
+                        //Console.WriteLine("Echoed text = {0}", data);
+                    }
                 }
+                catch (System.IO.IOException ex)
+                {
+                    if (ex.Message.Contains("WSACancelBlockingCall")) break;
+                }
+                break;
             }
         }
 
@@ -108,7 +130,7 @@ namespace Client
             isRunning = !isRunning;
             if (isRunning)
             {
-                Connect();
+                Connect(true);
                 var tRev = new Thread(Receive)
                 {
                     Name = "Receive"
@@ -120,7 +142,8 @@ namespace Client
             else
             {
                 isStop = true;
-                client.Close();
+                Connect(false);
+                //client.Close();
                 Btn_connect.Text = "Connect";
             }
 
