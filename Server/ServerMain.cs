@@ -228,6 +228,11 @@ namespace Server
         {
             Btn_start.PerformClick();
         }
+
+        private void Btn_getPubIP_Click(object sender, EventArgs e)
+        {
+            Combo_IpGroup.Text = Lib.GetPubIp();
+        }
     }
 
     public struct MsgPackage

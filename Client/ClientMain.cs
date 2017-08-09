@@ -42,16 +42,18 @@ namespace Client
                 var stream = client.GetStream();
                 string[] s = client.Client.LocalEndPoint.ToString().Split(new Char[] { ':' });
                 var port = s[1];
-                //string publicEndPoint;
-                //if (Check_lan.Checked)
-                //{
-                //    publicEndPoint = Lib.GetLocalIPAddress() + ":" + port;
-                //}
-                //else
-                //{
-                //    publicEndPoint = Lib.GetPubIp() + ":" + port;
-                //}
-                var endPoint = Txt_host.Text + ":" + port;
+                string endPoint;
+                if (Check_lan.Checked)
+                {
+                    endPoint = Txt_host.Text + ":" + port;
+                }
+                else
+                {
+                    var ip = Lib.GetPubIp();
+                    endPoint = ip + ":" + port;
+                    Txt_host.Text = ip;
+                }
+
                 var chatClient = new ChatClient(Txt_username.Text, Txt_password.Text, endPoint, isconnect);
                 new BinaryFormatter().Serialize(stream, chatClient);
             }

@@ -42,6 +42,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.Check_lan = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -185,12 +186,23 @@
             this.label4.TabIndex = 26;
             this.label4.Text = "Port:";
             // 
+            // Check_lan
+            // 
+            this.Check_lan.AutoSize = true;
+            this.Check_lan.Location = new System.Drawing.Point(403, -1);
+            this.Check_lan.Name = "Check_lan";
+            this.Check_lan.Size = new System.Drawing.Size(42, 16);
+            this.Check_lan.TabIndex = 27;
+            this.Check_lan.Text = "LAN";
+            this.Check_lan.UseVisualStyleBackColor = true;
+            // 
             // ClientMain
             // 
             this.AcceptButton = this.Btn_send;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 561);
+            this.Controls.Add(this.Check_lan);
             this.Controls.Add(this.Btn_send);
             this.Controls.Add(this.Rtxt_chat);
             this.Controls.Add(this.Txt_send);
@@ -231,6 +243,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox Check_lan;
     }
 }
 
