@@ -19,7 +19,6 @@ namespace Client
         //IPEndPoint ipe = ConnectionData.Ipe;
         IPEndPoint ipe;
 
-
         public ClientMain()
         {
             InitializeComponent();
