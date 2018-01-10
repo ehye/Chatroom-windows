@@ -1,10 +1,14 @@
 ﻿using ComLib;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
+using static System.Windows.Forms.ListView;
 
 namespace SimpleChatClient
 {
@@ -15,14 +19,16 @@ namespace SimpleChatClient
         private int port;
         private IPEndPoint ipe;
         private Thread tReader;
-        private ClientForm clientForm;
+        private ClientForm form;
+        private List<string> userList;
 
         public SimpleChatClient(string host, string port, ClientForm clientForm)
         {
             this.host = IPAddress.Parse(host);
             this.port = Int16.Parse(port);
             ipe = new IPEndPoint(this.host, this.port);
-            this.clientForm = clientForm;
+            this.form = clientForm;
+            userList = new List<string>();
         }
 
         private void SetUpNetworking()
@@ -50,6 +56,7 @@ namespace SimpleChatClient
             tcpClient.Close();
             try
             {
+                //Thread.Sleep(2000);
                 tcpClient.Close();
             }
             catch (Exception) { throw; }
@@ -57,24 +64,26 @@ namespace SimpleChatClient
 
         internal void Send(string message)
         {
-            Mail mail = new Mail(DateTime.Now.ToString(), clientForm.GetUsername, message);
+            Mail mail = new Mail(DateTime.Now.ToString(), form.GetUsername, message);
             try
             {
-                byte[] buffer = new byte[message.Length];
-                buffer = Encoding.UTF8.GetBytes(message);
-                tcpClient.Client.Send(buffer);
+                new BinaryFormatter().Serialize(tcpClient.GetStream(), mail);
+
+                //byte[] buffer = new byte[message.Length];
+                //buffer = Encoding.UTF8.GetBytes(message);
+                //tcpClient.Client.Send(buffer);
             }
             catch (Exception) { throw; }
         }
 
         class MessageReader
         {
-            SimpleChatClient simpleChatClient;
+            SimpleChatClient client;
             NetworkStream streamReader;
 
             public MessageReader(SimpleChatClient simpleChatClient)
             {
-                this.simpleChatClient = simpleChatClient;
+                this.client = simpleChatClient;
                 try
                 {
                     streamReader = simpleChatClient.tcpClient.GetStream();
@@ -86,28 +95,32 @@ namespace SimpleChatClient
             {
                 while (true) try
                 {
-                    byte[] buffer = new byte[1024];
-                    string message = String.Empty;
-                    int count = streamReader.Read(buffer, 0, buffer.Length);
-                    while (count != 0)
-                    {
-                        if (message.StartsWith("user"))
-                        {
-                            message = Encoding.UTF8.GetString(buffer, 0, count);
-                            string user = message.Substring(4);
+                    Mail mail = (Mail)new BinaryFormatter().Deserialize(streamReader);
 
-                            //clientForm.getList_Clients().setModel(dlm);
-                            //Console.WriteLine(user);
-                        }
-                        else
+                    if (mail.Username.Equals("server") && mail.Msg.StartsWith("userlist"))
+                    {
+                        string[] users = mail.Msg.Split(',');
+                        if (users.Length > 1)
                         {
-                            message = Encoding.UTF8.GetString(buffer, 0, count);
-                            simpleChatClient.clientForm.ShowMessage(message);
-                            //Console.WriteLine(message);
+                            for (int i = 1; i < users.Length; i++)
+                            {
+                                client.userList.Add(users[i]);
+                            }
                         }
-                        count = 0;
-                        streamReader.Flush();
                     }
+
+                    else if (!client.userList.Contains(mail.Username) && mail.Msg.Equals("Hello"))
+                        client.userList.Add(mail.Username);
+                    else if (client.userList.Contains(mail.Username) && mail.Msg.Equals("Bye"))
+                        client.userList.Remove(mail.Username);
+                    else
+                        client.form.ShowMessage(mail.Stamp, mail.Username, mail.Msg);
+
+                    client.form.GetUserList.Items.Clear();
+                    foreach (var item in client.userList)
+                        client.form.GetUserList.Items.Add(item);
+
+                    streamReader.Flush();
                 }
                 catch (IOException) { return; }
                 catch (Exception) { throw; }

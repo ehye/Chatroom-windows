@@ -15,6 +15,8 @@ namespace SimpleChatClient
 
         public string GetUsername { get => Txt_Username.Text; }
 
+        internal ListView GetUserList { get => List_User; }
+
         public ClientForm()
         {
             InitializeComponent();
@@ -32,12 +34,14 @@ namespace SimpleChatClient
             if (isConnect)
             {
                 client.Stop();
+                client.Send("Bye");
                 Btn_Connect.Text = "Connect";
                 Btn_Send.Enabled = true;
             }
             else
             {
                 client.Start();
+                client.Send("Hello");
                 Btn_Connect.Text = "Disconnect";
             }
             isConnect = !isConnect;
@@ -49,9 +53,9 @@ namespace SimpleChatClient
             Txt_Send.Text = String.Empty;
         }
 
-        public void ShowMessage(string message)
+        public void ShowMessage(string stamp, string name, string message)
         {
-            Rtxt_chatArea.AppendText(Environment.NewLine + DateTime.Now, Color.Blue);
+            Rtxt_chatArea.AppendText(Environment.NewLine + stamp + " " + name, Color.Blue);
             Rtxt_chatArea.AppendText(Environment.NewLine + message, Color.Black);
         }
     }

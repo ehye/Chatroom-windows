@@ -24,10 +24,14 @@ namespace ComLib
             this.msg = msg;
         }
 
-        public string Display()
-        {
-            return String.Format("%s %s:\n%s\n", stamp, username, msg);
-        }
+        //public string Display()
+        //{
+        //    return String.Format("%s %s:\n%s\n", stamp, username, msg);
+        //}
 
+        public override string ToString()
+        {
+            return String.Format($"{stamp} {username}:\n{msg}\n");
+        }
     }
 }

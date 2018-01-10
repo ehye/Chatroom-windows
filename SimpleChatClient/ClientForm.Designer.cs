@@ -35,7 +35,7 @@
             this.Txt_Host = new System.Windows.Forms.TextBox();
             this.Txt_Port = new System.Windows.Forms.TextBox();
             this.Btn_Connect = new System.Windows.Forms.Button();
-            this.listView1 = new System.Windows.Forms.ListView();
+            this.List_User = new System.Windows.Forms.ListView();
             this.Btn_Send = new System.Windows.Forms.Button();
             this.Txt_Username = new System.Windows.Forms.TextBox();
             this.Rtxt_chatArea = new System.Windows.Forms.RichTextBox();
@@ -59,7 +59,7 @@
             this.tableLayoutPanel1.Controls.Add(this.Txt_Host, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.Txt_Port, 3, 0);
             this.tableLayoutPanel1.Controls.Add(this.Btn_Connect, 6, 0);
-            this.tableLayoutPanel1.Controls.Add(this.listView1, 6, 1);
+            this.tableLayoutPanel1.Controls.Add(this.List_User, 6, 1);
             this.tableLayoutPanel1.Controls.Add(this.Btn_Send, 6, 2);
             this.tableLayoutPanel1.Controls.Add(this.Txt_Username, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.Rtxt_chatArea, 4, 1);
@@ -139,15 +139,15 @@
             this.Btn_Connect.UseVisualStyleBackColor = true;
             this.Btn_Connect.Click += new System.EventHandler(this.Btn_Connect_Click);
             // 
-            // listView1
+            // List_User
             // 
-            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.listView1.Location = new System.Drawing.Point(702, 38);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(95, 421);
-            this.listView1.TabIndex = 1;
-            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.List_User.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.List_User.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.List_User.Location = new System.Drawing.Point(702, 38);
+            this.List_User.Name = "List_User";
+            this.List_User.Size = new System.Drawing.Size(95, 421);
+            this.List_User.TabIndex = 1;
+            this.List_User.UseCompatibleStateImageBehavior = false;
             // 
             // Btn_Send
             // 
@@ -211,7 +211,7 @@
 
         #endregion
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ListView List_User;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox Txt_Host;
