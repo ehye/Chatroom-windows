@@ -10,11 +10,10 @@ namespace SimpleChatClient
 {
     public partial class ClientForm : Form
     {
-        bool isConnect = false;
-        SimpleChatClient client;
+        private bool isConnect = false;
+        private SimpleChatClient client;
 
-        public string GetUsername { get => Txt_Username.Text; }
-
+        internal string GetUsername { get => Txt_Username.Text; }
         internal ListView GetUserList { get => List_User; }
 
         public ClientForm()
@@ -36,13 +35,14 @@ namespace SimpleChatClient
                 client.Stop();
                 client.Send("Bye");
                 Btn_Connect.Text = "Connect";
-                Btn_Send.Enabled = true;
+                Btn_Send.Enabled = false;
             }
             else
             {
                 client.Start();
                 client.Send("Hello");
                 Btn_Connect.Text = "Disconnect";
+                Btn_Send.Enabled = true;
             }
             isConnect = !isConnect;
         }

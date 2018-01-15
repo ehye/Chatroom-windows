@@ -5,10 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-using static System.Windows.Forms.ListView;
 
 namespace SimpleChatClient
 {
@@ -24,10 +21,10 @@ namespace SimpleChatClient
 
         public SimpleChatClient(string host, string port, ClientForm clientForm)
         {
+            form = clientForm;
             this.host = IPAddress.Parse(host);
             this.port = Int16.Parse(port);
             ipe = new IPEndPoint(this.host, this.port);
-            this.form = clientForm;
             userList = new List<string>();
         }
 
@@ -52,26 +49,23 @@ namespace SimpleChatClient
 
         internal void Stop()
         {
+            Send($"Stop,{form.GetUsername}");
             tReader.Interrupt();
-            tcpClient.Close();
+            tReader.Abort();
             try
             {
-                //Thread.Sleep(2000);
                 tcpClient.Close();
             }
             catch (Exception) { throw; }
+            form.GetUserList.Clear();
         }
 
         internal void Send(string message)
         {
             Mail mail = new Mail(DateTime.Now.ToString(), form.GetUsername, message);
-            try
+            if (tcpClient.Connected) try
             {
                 new BinaryFormatter().Serialize(tcpClient.GetStream(), mail);
-
-                //byte[] buffer = new byte[message.Length];
-                //buffer = Encoding.UTF8.GetBytes(message);
-                //tcpClient.Client.Send(buffer);
             }
             catch (Exception) { throw; }
         }
@@ -83,7 +77,7 @@ namespace SimpleChatClient
 
             public MessageReader(SimpleChatClient simpleChatClient)
             {
-                this.client = simpleChatClient;
+                client = simpleChatClient;
                 try
                 {
                     streamReader = simpleChatClient.tcpClient.GetStream();
@@ -99,26 +93,18 @@ namespace SimpleChatClient
 
                     if (mail.Username.Equals("server") && mail.Msg.StartsWith("userlist"))
                     {
-                        string[] users = mail.Msg.Split(',');
-                        if (users.Length > 1)
-                        {
-                            for (int i = 1; i < users.Length; i++)
-                            {
-                                client.userList.Add(users[i]);
-                            }
-                        }
-                    }
+                        client.userList.Clear();
+                        client.form.GetUserList.Items.Clear();
 
-                    else if (!client.userList.Contains(mail.Username) && mail.Msg.Equals("Hello"))
-                        client.userList.Add(mail.Username);
-                    else if (client.userList.Contains(mail.Username) && mail.Msg.Equals("Bye"))
-                        client.userList.Remove(mail.Username);
+                        string[] users = mail.Msg.Split(',');
+                        for (int i = 1; i < users.Length; i++)
+                            client.userList.Add(users[i]);
+
+                        foreach (var item in client.userList)
+                            client.form.GetUserList.Items.Add(item);
+                    }
                     else
                         client.form.ShowMessage(mail.Stamp, mail.Username, mail.Msg);
-
-                    client.form.GetUserList.Items.Clear();
-                    foreach (var item in client.userList)
-                        client.form.GetUserList.Items.Add(item);
 
                     streamReader.Flush();
                 }

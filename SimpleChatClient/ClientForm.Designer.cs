@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -40,6 +41,7 @@
             this.Txt_Username = new System.Windows.Forms.TextBox();
             this.Rtxt_chatArea = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -148,10 +150,12 @@
             this.List_User.Size = new System.Drawing.Size(95, 421);
             this.List_User.TabIndex = 1;
             this.List_User.UseCompatibleStateImageBehavior = false;
+            this.List_User.View = System.Windows.Forms.View.List;
             // 
             // Btn_Send
             // 
             this.Btn_Send.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Btn_Send.Enabled = false;
             this.Btn_Send.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Btn_Send.Location = new System.Drawing.Point(702, 465);
             this.Btn_Send.Name = "Btn_Send";
@@ -194,6 +198,11 @@
             this.label3.TabIndex = 10;
             this.label3.Text = "Name";
             // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
+            // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -222,6 +231,7 @@
         private System.Windows.Forms.TextBox Txt_Username;
         private System.Windows.Forms.TextBox Txt_Send;
         private System.Windows.Forms.Button Btn_Send;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }
 

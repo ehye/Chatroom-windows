@@ -35,7 +35,7 @@
             // Btn_Start
             // 
             this.Btn_Start.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Btn_Start.Location = new System.Drawing.Point(805, 14);
+            this.Btn_Start.Location = new System.Drawing.Point(715, 14);
             this.Btn_Start.Name = "Btn_Start";
             this.Btn_Start.Size = new System.Drawing.Size(75, 30);
             this.Btn_Start.TabIndex = 0;
@@ -48,7 +48,7 @@
             this.Rtxt_Log.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Rtxt_Log.Location = new System.Drawing.Point(12, 14);
             this.Rtxt_Log.Name = "Rtxt_Log";
-            this.Rtxt_Log.Size = new System.Drawing.Size(787, 478);
+            this.Rtxt_Log.Size = new System.Drawing.Size(697, 328);
             this.Rtxt_Log.TabIndex = 1;
             this.Rtxt_Log.Text = "";
             // 
@@ -56,7 +56,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(892, 504);
+            this.ClientSize = new System.Drawing.Size(802, 354);
             this.Controls.Add(this.Rtxt_Log);
             this.Controls.Add(this.Btn_Start);
             this.Name = "ServerForm";

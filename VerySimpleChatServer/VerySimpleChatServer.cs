@@ -1,7 +1,9 @@
 ﻿using ComLib;
 using System;
+using System.Data;
 using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -12,17 +14,15 @@ namespace VerySimpleChatServer
     class VerySimpleChatServer
     {
         private TcpListener tcpListener;
-        private List<NetworkStream> clientStreams;
+        private Dictionary<NetworkStream, String> clients;
         private ServerForm form;
-        private List<string> userList;
 
         public VerySimpleChatServer(string host, string port, ServerForm serverForm)
         {
-            this.form = serverForm;
+            form = serverForm;
             var ipe = new IPEndPoint(IPAddress.Parse(host), Int16.Parse(port));
             tcpListener = new TcpListener(ipe);
-            clientStreams = new List<NetworkStream>();
-            userList = new List<string>();
+            clients = new Dictionary<NetworkStream, String>();
         }
 
         internal void Start()
@@ -34,24 +34,35 @@ namespace VerySimpleChatServer
             {
                 while (true) try
                 {
-                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                    NetworkStream stream = tcpClient.GetStream();
-                    clientStreams.Add(stream);
-                    ClientHandler clientHandler = new ClientHandler(tcpClient, this);
-                    Thread tHandler = new Thread(new ThreadStart(clientHandler.Run)) { Name = "Handler" };
+                    var tcpClient = tcpListener.AcceptTcpClient();
+                    var stream = tcpClient.GetStream();
+                    var clientHandler = new ClientHandler(tcpClient, this);
+                    var tHandler = new Thread(new ThreadStart(clientHandler.Run)) { Name = "Handler" };
                     tHandler.Start();
-                    form.PrintLog($"got a connection form {tcpClient.Client.RemoteEndPoint.ToString()} \n");
+                    //form.PrintLog($"got a connection form {tcpClient.Client.RemoteEndPoint.ToString()} \n");
+                }
+                catch (SocketException)
+                {
+                    break;
                 }
                 catch (Exception) { throw; }
             }).Start();
         }
 
+        internal void Stop()
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes("stop");
+            //tcpListener.Server.Send(buffer);
+            tcpListener.Stop();
+            form.PrintLog("server stop");
+        }
+
         internal void Broadcast(Mail mail)
         {
-            var i = clientStreams.GetEnumerator();
-            while (i.MoveNext()) try
+            var j = clients.GetEnumerator();
+            while (j.MoveNext()) try
             {
-                new BinaryFormatter().Serialize(i.Current, mail);
+                new BinaryFormatter().Serialize(j.Current.Key, mail);
             }
             catch (Exception) { throw; }
         }
@@ -69,43 +80,58 @@ namespace VerySimpleChatServer
                 {
                     this.tcpClient = tcpClient;
                     networkStream = tcpClient.GetStream();
-
-                    // TODO: send current user list
-                    StringBuilder sb = new StringBuilder("userlist");
-                    foreach (var item in server.userList)
-                        sb.AppendFormat(",{0}", item);
-
-                    //byte[] buffer = new byte[sb.Length];
-                    //buffer = Encoding.UTF8.GetBytes(sb.ToString());
-                    //tcpClient.Client.Send(buffer);
-
-                    Mail mail = new Mail(DateTime.Now.ToString(), "server", sb.ToString());
-                    new BinaryFormatter().Serialize(networkStream, mail);
                 }
                 catch (Exception) { throw; }
+            }
+
+            private void SendCurrentUserList()
+            {
+
+                foreach (var stream in server.clients.Keys)
+                {
+                    var sb = new StringBuilder("userlist");
+                    foreach (var item in server.clients.Values)
+                        sb.AppendFormat(",{0}", item);
+                    Mail mail = new Mail(DateTime.Now.ToString(), "server", sb.ToString());
+                    new BinaryFormatter().Serialize(stream, mail);
+                }
             }
 
             internal void Run()
             {
                 while (true) try
                 {
-                    var stream = tcpClient.GetStream();
-                    Mail mail = (Mail)new BinaryFormatter().Deserialize(stream);
-
-                    if (!server.userList.Contains(mail.Username))
+                    Mail mail = null;
+                    if (networkStream.CanWrite)
                     {
-                        server.userList.Add(mail.Username);
-                        server.form.PrintLog(mail.Username + " join the chat");
-                    }
-                    server.Broadcast(mail);
+                        mail = (Mail)new BinaryFormatter().Deserialize(networkStream);
 
-                    #region echo
-                    //message = message.ToUpper();
-                    //byte[] echomsg = Encoding.UTF8.GetBytes(message);
-                    //networkStream.Write(echomsg, 0, echomsg.Length);
-                    //Console.WriteLine($"Echo: {message}");
-                    #endregion
+                        // disconnect
+                        if (server.clients.ContainsValue(mail.Username) && mail.Msg.StartsWith("Stop"))
+                        {
+                            string[] s = mail.Msg.Split(',');
+                            var item = server.clients.First(kvp => kvp.Value == s[1]);
+                            item.Key.Close();
+                            server.clients.Remove(item.Key);
+                            SendCurrentUserList();
+                        }
+                    
+                        // new user
+                        if (!server.clients.ContainsValue(mail.Username) && mail.Msg.Equals("Hello"))
+                        {
+                            server.clients.Add(networkStream, (mail.Username));
+                            server.form.PrintLog($"{tcpClient.Client.RemoteEndPoint}  {mail.Username}  join the chat");
+                            SendCurrentUserList();
+                            //continue;
+                        }
+
+                        else
+                        {
+                            server.Broadcast(mail);
+                        }
+                    }
                 }
+                catch (ArgumentException) { break; }
                 catch (Exception) { throw; }
             }
         }

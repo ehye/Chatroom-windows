@@ -5,6 +5,9 @@ namespace VerySimpleChatServer
 {
     public partial class ServerForm : Form
     {
+        private bool isConnect = false;
+        private VerySimpleChatServer server;
+
         public ServerForm()
         {
             InitializeComponent();
@@ -13,8 +16,7 @@ namespace VerySimpleChatServer
 
         private void ServerForm_Load(object sender, EventArgs e)
         {
-            this.Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
-
+            Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
         }
 
         internal void PrintLog(string log)
@@ -24,8 +26,19 @@ namespace VerySimpleChatServer
 
         private void Btn_Start_Click(object sender, EventArgs e)
         {
-            VerySimpleChatServer verySimpleChatServer = new VerySimpleChatServer("127.0.0.1", "6017", this);
-            verySimpleChatServer.Start();
+
+            if (isConnect)
+            {
+                server.Stop();
+                Btn_Start.Text = "Star";
+            }
+            else
+            {
+                server = new VerySimpleChatServer("127.0.0.1", "6017", this);
+                server.Start();
+                Btn_Start.Text = "Stop";
+            }
+            isConnect = !isConnect;
         }
     }
 }
