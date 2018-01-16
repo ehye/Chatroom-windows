@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{D3D6608F-A67D-4800-9B88-79D9E783F8CB}"
 EndProject
@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComLib", "ComLib\ComLib.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{48C90157-63D2-4687-ADF3-2DEEF323FD9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerySimpleChatServer", "VerySimpleChatServer\VerySimpleChatServer.csproj", "{AABCA05F-C3E4-4626-A537-40C60F3A7893}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer", "VerySimpleChatServer\ChatServer.csproj", "{AABCA05F-C3E4-4626-A537-40C60F3A7893}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleChatClient", "SimpleChatClient\SimpleChatClient.csproj", "{F2A93B91-C26E-420C-87E4-CEBFB3AFA1BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatClient", "SimpleChatClient\ChatClient.csproj", "{F2A93B91-C26E-420C-87E4-CEBFB3AFA1BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

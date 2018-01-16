@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SimpleChatClient
+namespace ChatClient
 {
     public partial class ClientForm : Form
     {
         private bool isConnect = false;
-        private SimpleChatClient client;
+        private ChatClient client;
 
         internal string GetUsername { get => Txt_Username.Text; }
         internal ListView GetUserList { get => List_User; }
@@ -25,7 +25,7 @@ namespace SimpleChatClient
         private void ClientForm_Load(object sender, EventArgs e)
         {
             Text = Environment.MachineName + " Chat on " + Environment.OSVersion.ToString();
-            client = new SimpleChatClient(Txt_Host.Text, Txt_Port.Text, this);
+            client = new ChatClient(Txt_Host.Text, Txt_Port.Text, this);
         }
 
         private void Btn_Connect_Click(object sender, EventArgs e)
@@ -33,18 +33,16 @@ namespace SimpleChatClient
             if (isConnect)
             {
                 client.Stop();
-                client.Send("Bye");
                 Btn_Connect.Text = "Connect";
                 Btn_Send.Enabled = false;
+                isConnect = !isConnect;
             }
-            else
+            else if (client.Start())
             {
-                client.Start();
-                client.Send("Hello");
                 Btn_Connect.Text = "Disconnect";
                 Btn_Send.Enabled = true;
+                isConnect = !isConnect;
             }
-            isConnect = !isConnect;
         }
         
         private void Btn_Send_Click(object sender, EventArgs e)
@@ -57,6 +55,19 @@ namespace SimpleChatClient
         {
             Rtxt_chatArea.AppendText(Environment.NewLine + stamp + " " + name, Color.Blue);
             Rtxt_chatArea.AppendText(Environment.NewLine + message, Color.Black);
+        }
+
+        internal void ServerStop()
+        {
+            Btn_Connect.Text = "Connect";
+            Btn_Send.Enabled = false;
+            List_User.Items.Clear();
+            ShowMessage(DateTime.Now.ToString(), "server", "stop");
+        }
+
+        internal void ConnectError(string s)
+        {
+            MessageBox.Show(s, "Something happened", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace VerySimpleChatServer
+namespace ChatServer
 {
     static class Program
     {

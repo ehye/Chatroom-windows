@@ -7,9 +7,9 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
-namespace SimpleChatClient
+namespace ChatClient
 {
-    class SimpleChatClient
+    class ChatClient
     {
         protected TcpClient tcpClient;
         private IPAddress host;
@@ -19,7 +19,7 @@ namespace SimpleChatClient
         private ClientForm form;
         private List<string> userList;
 
-        public SimpleChatClient(string host, string port, ClientForm clientForm)
+        public ChatClient(string host, string port, ClientForm clientForm)
         {
             form = clientForm;
             this.host = IPAddress.Parse(host);
@@ -28,28 +28,37 @@ namespace SimpleChatClient
             userList = new List<string>();
         }
 
-        private void SetUpNetworking()
+        private bool SetUpNetworking()
         {
+            bool isPass = false;
             try
             {
                 tcpClient = new TcpClient();
                 tcpClient.Connect(ipe);
                 Console.WriteLine($"networking established to {host}:{port}");
+                isPass = true;
             }
+            catch (SocketException ex) { form.ConnectError(ex.Message); }
             catch (Exception) { throw; }
+            return isPass;
         }
 
-        internal void Start()
+        internal bool Start()
         {
-            SetUpNetworking();
-            MessageReader messageReader = new MessageReader(this);
-            tReader = new Thread(new ThreadStart(messageReader.Run)) { Name = "Read" };
-            tReader.Start();
+            if (SetUpNetworking())
+            {
+                MessageReader messageReader = new MessageReader(this);
+                tReader = new Thread(new ThreadStart(messageReader.Run)) { Name = "Read" };
+                tReader.Start();
+                Send("Hello");
+                return true;
+            }
+            return false;
         }
 
         internal void Stop()
         {
-            Send($"Stop,{form.GetUsername}");
+            Send($"Bye,{form.GetUsername}");
             tReader.Interrupt();
             tReader.Abort();
             try
@@ -62,7 +71,7 @@ namespace SimpleChatClient
 
         internal void Send(string message)
         {
-            Mail mail = new Mail(DateTime.Now.ToString(), form.GetUsername, message);
+            Mail mail = new Mail(form.GetUsername, message);
             if (tcpClient.Connected) try
             {
                 new BinaryFormatter().Serialize(tcpClient.GetStream(), mail);
@@ -72,10 +81,10 @@ namespace SimpleChatClient
 
         class MessageReader
         {
-            SimpleChatClient client;
+            ChatClient client;
             NetworkStream streamReader;
 
-            public MessageReader(SimpleChatClient simpleChatClient)
+            public MessageReader(ChatClient simpleChatClient)
             {
                 client = simpleChatClient;
                 try
@@ -87,11 +96,21 @@ namespace SimpleChatClient
 
             internal void Run()
             {
-                while (true) try
+                bool isRunning = true;
+                while (isRunning) try
                 {
                     Mail mail = (Mail)new BinaryFormatter().Deserialize(streamReader);
 
-                    if (mail.Username.Equals("server") && mail.Msg.StartsWith("userlist"))
+                    // server stop
+                    if (mail.Username.Equals("server") && mail.Msg.StartsWith("stop"))
+                    {
+                        client.userList.Clear();
+                        client.form.ServerStop();
+                        client.tcpClient.Close();
+                        isRunning = false;
+                    }
+                    // new user
+                    else if (mail.Username.Equals("server") && mail.Msg.StartsWith("userlist"))
                     {
                         client.userList.Clear();
                         client.form.GetUserList.Items.Clear();

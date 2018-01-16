@@ -17,9 +17,16 @@ namespace ComLib
         public string Username { get => username; private set => username = value; }
         public string Msg { get => msg; private set => msg = value; }
 
-        public Mail(string stamp, string username, string msg)
+        //public Mail(string stamp, string username, string msg)
+        //{
+        //    this.stamp = stamp;
+        //    this.username = username;
+        //    this.msg = msg;
+        //}
+
+        public Mail(string username, string msg)
         {
-            this.stamp = stamp;
+            stamp = DateTime.Now.ToString();
             this.username = username;
             this.msg = msg;
         }

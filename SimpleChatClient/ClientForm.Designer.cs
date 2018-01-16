@@ -1,4 +1,4 @@
-﻿namespace SimpleChatClient
+﻿namespace ChatClient
 {
     partial class ClientForm
     {
@@ -55,7 +55,6 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.label2, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.Txt_Send, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.Txt_Host, 1, 0);
@@ -66,6 +65,7 @@
             this.tableLayoutPanel1.Controls.Add(this.Txt_Username, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.Rtxt_chatArea, 4, 1);
             this.tableLayoutPanel1.Controls.Add(this.label3, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 2, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(5);
@@ -74,6 +74,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 533);
             this.tableLayoutPanel1.TabIndex = 2;
@@ -100,8 +101,8 @@
             // 
             // Txt_Send
             // 
+            this.Txt_Send.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.tableLayoutPanel1.SetColumnSpan(this.Txt_Send, 6);
-            this.Txt_Send.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Txt_Send.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Txt_Send.Location = new System.Drawing.Point(3, 465);
             this.Txt_Send.Multiline = true;

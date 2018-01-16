@@ -9,20 +9,20 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 
-namespace VerySimpleChatServer
+namespace ChatServer
 {
-    class VerySimpleChatServer
+    class ChatServer
     {
         private TcpListener tcpListener;
         private Dictionary<NetworkStream, String> clients;
         private ServerForm form;
 
-        public VerySimpleChatServer(string host, string port, ServerForm serverForm)
+        public ChatServer(string host, string port, ServerForm serverForm)
         {
-            form = serverForm;
             var ipe = new IPEndPoint(IPAddress.Parse(host), Int16.Parse(port));
             tcpListener = new TcpListener(ipe);
             clients = new Dictionary<NetworkStream, String>();
+            form = serverForm;
         }
 
         internal void Start()
@@ -39,7 +39,6 @@ namespace VerySimpleChatServer
                     var clientHandler = new ClientHandler(tcpClient, this);
                     var tHandler = new Thread(new ThreadStart(clientHandler.Run)) { Name = "Handler" };
                     tHandler.Start();
-                    //form.PrintLog($"got a connection form {tcpClient.Client.RemoteEndPoint.ToString()} \n");
                 }
                 catch (SocketException)
                 {
@@ -51,8 +50,8 @@ namespace VerySimpleChatServer
 
         internal void Stop()
         {
-            byte[] buffer = Encoding.UTF8.GetBytes("stop");
-            //tcpListener.Server.Send(buffer);
+            Mail mail = new Mail("server", "stop");
+            Broadcast(mail);
             tcpListener.Stop();
             form.PrintLog("server stop");
         }
@@ -71,9 +70,9 @@ namespace VerySimpleChatServer
         {
             TcpClient tcpClient;
             NetworkStream networkStream;
-            VerySimpleChatServer server;
+            ChatServer server;
 
-            public ClientHandler(TcpClient tcpClient, VerySimpleChatServer server)
+            public ClientHandler(TcpClient tcpClient, ChatServer server)
             {
                 this.server = server;
                 try
@@ -92,7 +91,7 @@ namespace VerySimpleChatServer
                     var sb = new StringBuilder("userlist");
                     foreach (var item in server.clients.Values)
                         sb.AppendFormat(",{0}", item);
-                    Mail mail = new Mail(DateTime.Now.ToString(), "server", sb.ToString());
+                    Mail mail = new Mail("server", sb.ToString());
                     new BinaryFormatter().Serialize(stream, mail);
                 }
             }
@@ -107,8 +106,9 @@ namespace VerySimpleChatServer
                         mail = (Mail)new BinaryFormatter().Deserialize(networkStream);
 
                         // disconnect
-                        if (server.clients.ContainsValue(mail.Username) && mail.Msg.StartsWith("Stop"))
+                        if (server.clients.ContainsValue(mail.Username) && mail.Msg.StartsWith("Bye"))
                         {
+                            server.form.PrintLog($"{mail.Username}({tcpClient.Client.RemoteEndPoint}) leave the chat");
                             string[] s = mail.Msg.Split(',');
                             var item = server.clients.First(kvp => kvp.Value == s[1]);
                             item.Key.Close();
@@ -120,9 +120,8 @@ namespace VerySimpleChatServer
                         if (!server.clients.ContainsValue(mail.Username) && mail.Msg.Equals("Hello"))
                         {
                             server.clients.Add(networkStream, (mail.Username));
-                            server.form.PrintLog($"{tcpClient.Client.RemoteEndPoint}  {mail.Username}  join the chat");
+                            server.form.PrintLog($"{mail.Username}({tcpClient.Client.RemoteEndPoint}) join the chat");
                             SendCurrentUserList();
-                            //continue;
                         }
 
                         else
@@ -132,6 +131,7 @@ namespace VerySimpleChatServer
                     }
                 }
                 catch (ArgumentException) { break; }
+                catch (System.Runtime.Serialization.SerializationException) { break; }
                 catch (Exception) { throw; }
             }
         }

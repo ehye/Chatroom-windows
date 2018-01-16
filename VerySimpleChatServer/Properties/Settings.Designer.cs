@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace VerySimpleChatServer.Properties
+namespace ChatServer.Properties
 {
 
 

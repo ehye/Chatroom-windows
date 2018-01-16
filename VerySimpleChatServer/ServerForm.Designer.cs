@@ -1,4 +1,4 @@
-﻿namespace VerySimpleChatServer
+﻿namespace ChatServer
 {
     partial class ServerForm
     {
