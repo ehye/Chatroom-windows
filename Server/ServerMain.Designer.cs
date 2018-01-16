@@ -28,21 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Btn_start = new System.Windows.Forms.Button();
             this.Rtxt_chat = new System.Windows.Forms.RichTextBox();
-            this.dgv_info = new System.Windows.Forms.DataGridView();
+            this.Dgv_Info = new System.Windows.Forms.DataGridView();
             this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.username = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.Combo_IpGroup = new System.Windows.Forms.ComboBox();
+            this.Combo_IP = new System.Windows.Forms.ComboBox();
             this.Txt_port = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.Btn_getPubIP = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dgv_info)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Dgv_Info)).BeginInit();
             this.SuspendLayout();
             // 
             // Btn_start
@@ -69,39 +69,39 @@
             this.Rtxt_chat.Text = "";
             this.Rtxt_chat.TextChanged += new System.EventHandler(this.Rtxt_chat_TextChanged);
             // 
-            // dgv_info
+            // Dgv_Info
             // 
-            this.dgv_info.AllowUserToAddRows = false;
-            this.dgv_info.AllowUserToDeleteRows = false;
-            this.dgv_info.AllowUserToResizeRows = false;
-            this.dgv_info.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dgv_info.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.dgv_info.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.dgv_info.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgv_info.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("微软雅黑", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_info.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.dgv_info.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv_info.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Dgv_Info.AllowUserToAddRows = false;
+            this.Dgv_Info.AllowUserToDeleteRows = false;
+            this.Dgv_Info.AllowUserToResizeRows = false;
+            this.Dgv_Info.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.Dgv_Info.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.Dgv_Info.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.Dgv_Info.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.Dgv_Info.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("微软雅黑", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.Dgv_Info.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.Dgv_Info.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Dgv_Info.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
             this.username,
             this.ip});
-            this.dgv_info.Location = new System.Drawing.Point(12, 386);
-            this.dgv_info.Name = "dgv_info";
-            this.dgv_info.ReadOnly = true;
-            this.dgv_info.RowHeadersVisible = false;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("微软雅黑", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.dgv_info.RowsDefaultCellStyle = dataGridViewCellStyle4;
-            this.dgv_info.RowTemplate.Height = 23;
-            this.dgv_info.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgv_info.Size = new System.Drawing.Size(760, 150);
-            this.dgv_info.TabIndex = 29;
+            this.Dgv_Info.Location = new System.Drawing.Point(12, 386);
+            this.Dgv_Info.Name = "Dgv_Info";
+            this.Dgv_Info.ReadOnly = true;
+            this.Dgv_Info.RowHeadersVisible = false;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("微软雅黑", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Dgv_Info.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.Dgv_Info.RowTemplate.Height = 23;
+            this.Dgv_Info.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.Dgv_Info.Size = new System.Drawing.Size(760, 150);
+            this.Dgv_Info.TabIndex = 29;
             // 
             // id
             // 
@@ -132,14 +132,14 @@
             this.statusStrip1.TabIndex = 31;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // Combo_IpGroup
+            // Combo_IP
             // 
-            this.Combo_IpGroup.Font = new System.Drawing.Font("微软雅黑", 11F);
-            this.Combo_IpGroup.FormattingEnabled = true;
-            this.Combo_IpGroup.Location = new System.Drawing.Point(86, 12);
-            this.Combo_IpGroup.Name = "Combo_IpGroup";
-            this.Combo_IpGroup.Size = new System.Drawing.Size(174, 28);
-            this.Combo_IpGroup.TabIndex = 32;
+            this.Combo_IP.Font = new System.Drawing.Font("微软雅黑", 11F);
+            this.Combo_IP.FormattingEnabled = true;
+            this.Combo_IP.Location = new System.Drawing.Point(86, 12);
+            this.Combo_IP.Name = "Combo_IP";
+            this.Combo_IP.Size = new System.Drawing.Size(174, 28);
+            this.Combo_IP.TabIndex = 32;
             // 
             // Txt_port
             // 
@@ -189,9 +189,9 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Txt_port);
-            this.Controls.Add(this.Combo_IpGroup);
+            this.Controls.Add(this.Combo_IP);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.dgv_info);
+            this.Controls.Add(this.Dgv_Info);
             this.Controls.Add(this.Rtxt_chat);
             this.Controls.Add(this.Btn_getPubIP);
             this.Controls.Add(this.Btn_start);
@@ -199,7 +199,7 @@
             this.Name = "ServerMain";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.ServerMain_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dgv_info)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Dgv_Info)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -208,12 +208,12 @@
         #endregion
         private System.Windows.Forms.Button Btn_start;
         private System.Windows.Forms.RichTextBox Rtxt_chat;
-        private System.Windows.Forms.DataGridView dgv_info;
+        private System.Windows.Forms.DataGridView Dgv_Info;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.DataGridViewTextBoxColumn id;
         private System.Windows.Forms.DataGridViewTextBoxColumn username;
         private System.Windows.Forms.DataGridViewTextBoxColumn ip;
-        private System.Windows.Forms.ComboBox Combo_IpGroup;
+        private System.Windows.Forms.ComboBox Combo_IP;
         private System.Windows.Forms.TextBox Txt_port;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;

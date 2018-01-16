@@ -34,8 +34,8 @@ namespace Server
         {
             this.Text = "Server on " + Environment.MachineName + " " + Environment.OSVersion.ToString();
 
-            Combo_IpGroup.Items.AddRange(Lib.GetLocalIPAddresses());
-
+            Combo_IP.Items.Add("127.0.0.1");
+            Combo_IP.Items.AddRange(Lib.GetLocalIPAddresses());
 
             kvp_tick_message = new Dictionary<long, string>();
             clientsList = new List<ChatClient>();
@@ -59,7 +59,7 @@ namespace Server
                     {
                         clientsList.Add(client);
                         socketsList.Add(handler);
-                        dgv_info.Rows.Add("id", client.Username, client.Ip);
+                        Dgv_Info.Rows.Add("id", client.Username, client.Ip);
                     }
                     else
                     {
@@ -185,7 +185,7 @@ namespace Server
             isStarting = !isStarting;
             if (isStarting)
             {
-                var ip = IPAddress.Parse(Combo_IpGroup.Text);
+                var ip = IPAddress.Parse(Combo_IP.Text);
                 var port = Int16.Parse(Txt_port.Text);
                 var ipe = new IPEndPoint(ip, port);
                 listener = new TcpListener(ipe);
@@ -211,7 +211,7 @@ namespace Server
                 isStop = true;
                 listener.Stop();
                 clientsList.Clear();
-                dgv_info.Rows.Clear();
+                Dgv_Info.Rows.Clear();
                 Btn_start.Text = "Start";
             }
         }
@@ -229,7 +229,7 @@ namespace Server
 
         private void Btn_getPubIP_Click(object sender, EventArgs e)
         {
-            Combo_IpGroup.Text = Lib.GetPubIp();
+            Combo_IP.Text = Lib.GetPubIp();
         }
     }
 

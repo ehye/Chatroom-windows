@@ -13,12 +13,12 @@ namespace ComLib
             return s[0];
         }
 
+        /// <summary>
+        /// 精确IP,需连接上互联网
+        /// </summary>
+        /// <returns></returns>
         public static string GetLocalIPAddress()
         {
-            /*
-             * 精确IP
-             * 需连接上互联网
-             */
             string localIP;
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.IP))
             {

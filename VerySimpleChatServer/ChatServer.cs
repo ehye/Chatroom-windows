@@ -121,6 +121,7 @@ namespace ChatServer
                         {
                             server.clients.Add(networkStream, (mail.Username));
                             server.form.PrintLog($"{mail.Username}({tcpClient.Client.RemoteEndPoint}) join the chat");
+                            server.form.AddToDGV("id", mail.Username, tcpClient.Client.RemoteEndPoint.ToString());
                             SendCurrentUserList();
                         }
 
