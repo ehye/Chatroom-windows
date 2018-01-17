@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AABCA05F-C3E4-4626-A537-40C60F3A7893}</ProjectGuid>
+    <ProjectGuid>{F2A93B91-C26E-420C-87E4-CEBFB3AFA1BC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>VerySimpleChatServer</RootNamespace>
-    <AssemblyName>VerySimpleChatServer</AssemblyName>
+    <RootNamespace>ChatClient</RootNamespace>
+    <AssemblyName>ChatClient</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -65,15 +65,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ServerForm.cs">
+    <Compile Include="ClientForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ServerForm.Designer.cs">
-      <DependentUpon>ServerForm.cs</DependentUpon>
+    <Compile Include="ClientForm.Designer.cs">
+      <DependentUpon>ClientForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ChatServer.cs" />
+    <Compile Include="ChatClient.cs" />
+    <EmbeddedResource Include="ClientForm.resx">
+      <DependentUpon>ClientForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -82,10 +85,8 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="ServerForm.resx">
-      <DependentUpon>ServerForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -101,7 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ComLib\ComLib.csproj">
-      <Project>{d22ef8b4-0ae4-4ac1-a6c6-e4d07fe65128}</Project>
+      <Project>{D22EF8B4-0AE4-4AC1-A6C6-E4D07FE65128}</Project>
       <Name>ComLib</Name>
     </ProjectReference>
   </ItemGroup>
