@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <title>Web sockets test</title>
+        <style type="text/css">
+            .container {
+                width: 680px;
+                height: 400px;
+                overflow: auto;
+                border: 1px solid black;
+            }
+        </style>
+        <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.slim.min.js"></script>
+    </head>
+
+    <body>
+        <form id="form1">
+            <h1>WebChat</h1>
+            <br/> 服务器地址:
+            <input type="text" id="Connection" value="127.0.0.1:6017/Chat" /> 用户名:
+            <input type="text" id="txtName" value="yjw" />
+            <button id='ToggleConnection' type="button" onclick='ToggleConnectionClicked();'>连接</button>
+            <br/>
+            <br/>
+            <div id='LogContainer' class='container'></div>
+            <br/>
+            <div id='SendDataContainer'>
+                <input type="text" id="DataToSend" size="88" />
+                <button id='SendData' type="button" onclick='SendDataClicked();'>发送</button>
+            </div>
+        </form>
+    </body>
+    <script type="text/javascript">
+        var ws;
+        var SocketCreated = false;
+        var isUserloggedout = false;
+        var idNameMap = new Map();
+        var _uid;
+
+        function WSonOpen() {
+            Log("Connection established", "OK");
+
+            var j = "{\"user_id\":" + _uid + ",\"name\":\"" +
+                $("#txtName")[0].value +
+                "\",\"type\":\"connection\",\"message\":\"\"}";
+
+            //ws.send(j);
+        };
+
+        function WSonMessage(event) {
+
+            var j = JSON.parse(event.data);
+
+            switch (j.type) {
+                case ("connection"):
+                    _uid = j.user_id;
+                    idNameMap.set(j.user_id, j.name);
+                    Log(j.name + " join the chat");
+                    break;
+                case ("message"):
+                    Log(j.name + ": " + j.message);
+                    break;
+                case ("disconnect"):
+                    idNameMap.delete(_uid);
+                    Log(j.name + " disconnect");
+                    break;
+                default:
+                    Log(JSON.stringify(j));
+            }
+        };
+
+        function WSonClose(event) {
+            if (isUserloggedout)
+                Log("disconnect, reason:" + event.reason);
+
+            $("#ToggleConnection")[0].innerHTML = "连接";
+        };
+
+        function WSonError() {
+            Log("远程连接中断。", "ERROR");
+        };
+
+        function ToggleConnectionClicked() {
+            if (SocketCreated && (ws.readyState == 0 || ws.readyState == 1)) {
+                SocketCreated = false;
+                isUserloggedout = true;
+                ws.close(1000);
+            } else {
+                Log("Connectting ...");
+                try {
+                    if ("WebSocket" in window) {
+                        ws = new WebSocket("ws://" + $("#Connection")[0].value + "?name=" + $("#txtName")[0].value);
+                    } else if ("MozWebSocket" in window) {
+                        ws = new MozWebSocket("ws://" + $("#Connection")[0].value);
+                    }
+
+                    SocketCreated = true;
+                    isUserloggedout = false;
+                } catch (ex) {
+                    Log(ex, "ERROR");
+                    return;
+                }
+                $("#ToggleConnection")[0].innerHTML = "断开";
+                ws.onopen = WSonOpen;
+                ws.onmessage = WSonMessage;
+                ws.onclose = WSonClose;
+                ws.onerror = WSonError;
+            }
+        };
+
+        function SendDataClicked() {
+            if ($("#DataToSend")[0].value.trim() != "") {
+
+                var j = "{\"user_id\":\"52704\",\"name\":\"" +
+                    $("#txtName")[0].value +
+                    "\",\"type\":\"message\",\"message\":\"" +
+                    $("#DataToSend")[0].value + "\"}";
+
+                ws.send(j);
+                $("#DataToSend")[0].value = "";
+            }
+        };
+
+        function Log(Text, MessageType) {
+            // if (MessageType == "OK") Text = "<span style='color: green;'>" + Text + "</span>";
+            // if (MessageType == "ERROR") Text = "<span style='color: red;'>" + Text + "</span>";
+            $("#LogContainer")[0].innerHTML = $("#LogContainer")[0].innerHTML + Text + "<br/>";
+            $("#LogContainer")[0].scrollTop = $("#LogContainer")[0].scrollHeight;
+        };
+
+        $(document).ready(function() {
+            var WebSocketsExist = true;
+            try {
+                var dummy = new WebSocket("wss://echo.websocket.org");
+            } catch (ex) {
+                try {
+                    webSocket = new MozWebSocket("wss://echo.websocket.org");
+                } catch (ex) {
+                    WebSocketsExist = false;
+                }
+            }
+
+            if (WebSocketsExist) {
+                Log("您的浏览器支持WebSocket. 您可以尝试连接到聊天服务器!", "OK");
+                // $("#Connection")[0].value = "127.0.0.1:6017/Chat";
+            } else {
+                Log("您的浏览器不支持WebSocket。请选择其他的浏览器再尝试连接服务器。", "ERROR");
+                $("#ToggleConnection")[0].disabled = true;
+            }
+
+            $("#DataToSend").keypress(function(event) {
+                if (event.keyCode == 13) {
+                    $("#SendData").click();
+                    event.preventDefault();
+                }
+            })
+        });
+    </script>
+
+</html>
