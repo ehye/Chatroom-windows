@@ -11,7 +11,8 @@ namespace wsServer
     public class Chat : WebSocketBehavior
     {
         private string _name;
-        
+        private int _capacity = 10;
+
         public Chat()
         {
             
@@ -23,19 +24,26 @@ namespace wsServer
             string[] data = { ID, _name, "connection", "", "" };
             Sessions.Broadcast(CreateTextMessage(data));
 
-            if (!Program.IdNamePairs.ContainsKey(ID))
+            if (!Program.IdNamePairs.ContainsKey(ID)) // 确保健壮后可删
             {
                 Program.IdNamePairs.Add(ID, _name);
             }
 
-            // 单独发送之前已经加入聊天室的列表信息
+            // sent online members
             List<string> myCollection = new List<string>();
             myCollection.Add("list");
             myCollection.AddRange(Program.IdNamePairs.Values.ToList());
             myCollection.Remove(_name);
-
             var json = JsonConvert.SerializeObject(myCollection);
             Sessions.SendTo(json, ID);
+
+            // send last queue.count message
+            for (int i = 0, len = Program.msg.Count; i < len; i++)
+            {
+                var message = Program.msg.Dequeue();
+                Sessions.SendTo(CreateTextMessage(message),ID);
+            }
+
             Console.WriteLine(Context.UserEndPoint.ToString() + " join the chat");
         }
 
@@ -53,11 +61,21 @@ namespace wsServer
 
             string _to = data[4];
 
-            if (_to.Equals(String.Empty))
+            if (_to.Equals(string.Empty))
             {
+
+                // set message buffer capacity
+                if (Program.msg.Count > _capacity)
+                    Program.msg.Dequeue();
+                Program.msg.Enqueue(data);
+
+                //foreach (var m in Program.msg)
+                //    m.ToList().ForEach(Console.WriteLine);
+                //Console.WriteLine("==========");
+
                 Sessions.Broadcast(CreateTextMessage(data));
             }
-            else
+            else // private chat
             {
                 foreach (var uid in Sessions.IDs)
                 {
@@ -96,16 +114,14 @@ namespace wsServer
             var name = (string)json["name"];
             var type = (string)json["type"];
             var msg = (string)json["message"];
-            var to = (string)json["to"] ?? String.Empty;
+            var to = (string)json["to"] ?? string.Empty;
 
             switch (type)
             {
                 case "connection":
-                    // TODO: sent cunrrent online users list
                     msg = name + " join the chat";
                     break;
                 case "message":
-                    // TODO: save meassage in db
                     break;
                 case "disconnect":
                     Console.WriteLine($"{name} disconnect");
@@ -120,6 +136,8 @@ namespace wsServer
     public class Program
     {
         public static Dictionary<string, string> IdNamePairs = new Dictionary<string, string>();
+        public static Queue<string[]> msg = new Queue<string[]>();
+
         static void Main(string[] args)
         {
             #region mysql test
@@ -141,10 +159,9 @@ namespace wsServer
             #endregion
 
 
-            Console.WriteLine("use number for opening port, ramdon if empty: ");
+            Console.WriteLine("use number for opening port (defalut: 6017): ");
             int.TryParse(Console.ReadLine(), out int port);
             port = String.IsNullOrEmpty(port.ToString()) ? port : 6017;
-            Console.WriteLine(port);
 
             var wssv = new WebSocketServer(port);
             wssv.AddWebSocketService<Chat>("/Chat");
@@ -162,26 +179,8 @@ namespace wsServer
             while (true)
             {
                 if (Console.ReadKey().KeyChar == 'q')
-                {
                     break;
-                }
-                //System.Threading.Thread.Sleep(1000);
-                //foreach (var host in wssv.WebSocketServices.Hosts)
-                //{
-                //    foreach (var session in host.Sessions.Sessions)
-                //    {
-                //        string id = session.ID;
-                //        string name = session.Context.QueryString["name"];
-                //        if (!IdNamePairs.ContainsKey(id))
-                //        {
-                //            IdNamePairs.Add(id, name);
-                //        }
-                //        //if (session.State == WebSocketState.Closing || session.State == WebSocketState.Closed)
-                //        //{
-                //        //    IdNamePairs.Remove(id);
-                //        //}
-                //    }
-                //}
+                
             }
 
             wssv.Stop(CloseStatusCode.Normal, "administor was close the server");
