@@ -11,20 +11,20 @@ namespace wsServer
             get; set;
         }
 
-        [JsonProperty("name")]
-        public string Name
-        {
-            get; set;
-        }
-
         [JsonProperty("type")]
         public string Type
         {
             get; set;
         }
 
-        [JsonProperty("message")]
-        public string Message
+        [JsonProperty("name")]
+        public string Name
+        {
+            get; set;
+        }
+
+        [JsonProperty("data")]
+        public string Data
         {
             get; set;
         }
@@ -35,9 +35,15 @@ namespace wsServer
             get; set;
         }
 
-        public override string ToString()
+        //public override string ToString()
+        //{
+        //    return JsonConvert.SerializeObject(this);
+        //}
+
+        public byte[] ToJsonByte()
         {
-            return JsonConvert.SerializeObject(this);
+            string json = JsonConvert.SerializeObject(this);
+            return System.Text.Encoding.UTF8.GetBytes(json);
         }
     }
 }
