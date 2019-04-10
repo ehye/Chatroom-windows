@@ -7,11 +7,14 @@ namespace wsServer
 {
     public class DBConnection
     {
+        private string databaseName;
+        private MySqlConnection connection = null;
+        private static DBConnection _instance = null;
+
         private DBConnection()
         {
         }
 
-        private string databaseName = string.Empty;
         public string DatabaseName
         {
             get { return databaseName; }
@@ -19,13 +22,11 @@ namespace wsServer
         }
 
         public string Password { get; set; }
-        private MySqlConnection connection = null;
         public MySqlConnection Connection
         {
             get { return connection; }
         }
 
-        private static DBConnection _instance = null;
         public static DBConnection Instance()
         {
             if (_instance == null)
@@ -37,7 +38,7 @@ namespace wsServer
         {
             if (Connection == null)
             {
-                if (String.IsNullOrEmpty(databaseName))
+                if (string.IsNullOrEmpty(databaseName))
                     return false;
                 string connstring = string.Format("Server=localhost; database={0}; UID=root; password=admin", databaseName);
                 connection = new MySqlConnection(connstring);

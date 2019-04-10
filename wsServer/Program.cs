@@ -44,23 +44,23 @@ namespace wsServer
             Sessions.SendTo(CreateMessage(data1), ID);
 
             // binary test
-            byte[] imageArray = File.ReadAllBytes(@"C:\Users\yjw96\Documents\Visual Studio 2017\Projects\Chatroom-windows\0.jpg");
-            string base64ImageRepresentation = Convert.ToBase64String(imageArray);
-            string[] data2 = { "", "pic", "", base64ImageRepresentation, "" };
-            Sessions.SendTo(CreateMessage(data2), ID);
+            //byte[] imageArray = File.ReadAllBytes(@"C:\Users\yjw96\Documents\Visual Studio 2017\Projects\Chatroom-windows\0.jpg");
+            //string base64ImageRepresentation = Convert.ToBase64String(imageArray);
+            //string[] data2 = { "", "pic", "", base64ImageRepresentation, "" };
+            //Sessions.SendTo(CreateMessage(data2), ID);
 
             // send last queue.count message
             for (int i = 0, len = Program.msg.Count; i < len; i++)
             {
                 var message = Program.msg.Dequeue();
-                //Sessions.SendTo(CreateMessage(message), ID);
+                Sessions.SendTo(CreateMessage(message), ID);
             }
 
             Console.WriteLine(Context.UserEndPoint.ToString() + " join the chat");
         }
 
         /// <summary>
-        /// 对从客户端发来的数据经行（处理并）转发
+        /// 对从客户端发来的数据进行（处理并）转发
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMessage(MessageEventArgs e)
@@ -75,28 +75,12 @@ namespace wsServer
 
             if (_to.Equals(string.Empty)) // 无指向则群聊
             {
-
                 // set message buffer capacity
                 if (Program.msg.Count > _capacity)
                     Program.msg.Dequeue();
                 Program.msg.Enqueue(data);
 
-                //foreach (var m in Program.msg)
-                //    m.ToList().ForEach(Console.WriteLine);
-                //Console.WriteLine("==========");
                 Sessions.Broadcast(CreateMessage(data));
-            }
-            else // private chat
-            {
-                //foreach (var uid in Sessions.IDs)
-                //{
-                //    if (uid == _to)
-                //    {
-                //        Sessions.SendTo(CreateMessage(data), uid);
-                //        if (ID != uid)
-                //            Sessions.SendTo(CreateMessage(data), ID);
-                //    } 
-                //}
             }
         }
 
@@ -129,30 +113,6 @@ namespace wsServer
             var data = (string)json["data"];
             var to = (string)json["to"] ?? string.Empty;
 
-            //switch (type)
-            //{
-            //    // Type: com, list, msg, pic,file
-            //    case "com":
-            //        //data = name + " join the chat";
-            //        if (data == "connect")
-            //        {
-                         
-            //        } else if(data == "disconnect")
-            //        {
-            //            Console.WriteLine($"{name} disconnect");
-            //        }
-            //        break;
-            //    //case "list":
-            //    //    break;
-            //    case "msg":
-            //        break;
-            //    case "pic":
-            //        break;
-            //    case "file":
-            //        break;
-            //    default:
-            //        break;
-            //}
             return new string[5] { uid, type, name, data, to };
         }
     }
@@ -182,10 +142,9 @@ namespace wsServer
             //}
             #endregion
 
-
             Console.WriteLine("use number for opening port (defalut: 6017): ");
             int.TryParse(Console.ReadLine(), out int port);
-            port = String.IsNullOrEmpty(port.ToString()) ? port : 6017;
+            port = string.IsNullOrEmpty(port.ToString()) ? port : 6017;
 
             var wssv = new WebSocketServer(port);
             wssv.AddWebSocketService<Chat>("/Chat");
@@ -204,7 +163,6 @@ namespace wsServer
             {
                 if (Console.ReadKey().KeyChar == 'q')
                     break;
-                
             }
 
             wssv.Stop(CloseStatusCode.Normal, "administor was close the server");

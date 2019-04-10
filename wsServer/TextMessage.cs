@@ -35,11 +35,6 @@ namespace wsServer
             get; set;
         }
 
-        //public override string ToString()
-        //{
-        //    return JsonConvert.SerializeObject(this);
-        //}
-
         public byte[] ToJsonByte()
         {
             string json = JsonConvert.SerializeObject(this);
